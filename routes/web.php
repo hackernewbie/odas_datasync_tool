@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\GoogleSheetService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,12 @@ Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('ho
 //Update User Details
 Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
 Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class, 'updatePassword'])->name('updatePassword');
+
+
+Route::get('data',function(GoogleSheetService $gsheet){
+    $gsheet->readGoogleSheet(config('google.sheet_name'));
+});
+
 
 // Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
 Route::get('dashboard',[App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
