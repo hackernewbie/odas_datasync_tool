@@ -29,7 +29,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{route('fascilities')}}" class="waves-effects">
+                    <a href="{{route('facilities')}}" class="waves-effects">
                         <i class='bx bx-plus-medical'></i>
                         <span key="Sync">Facilities</span>
                     </a>

@@ -35,7 +35,7 @@ class GoogleSheetService
             ->spreadsheets_values
             ->batchGet($this->spreadSheetId, ['ranges' => $range]);
 
-        dd($data->getValueRanges()[0]->values);
+        //dd($data->getValueRanges()[0]->values);
         return $data->getValueRanges()[0]->values;
     }
 

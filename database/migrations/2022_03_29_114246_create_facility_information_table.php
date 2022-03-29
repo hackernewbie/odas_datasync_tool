@@ -24,11 +24,12 @@ class CreateFacilityInformationTable extends Migration
             $table->string('pincode')->nullable();
             $table->string('state_lgd_code');
             $table->string('subdistrict_lgd_code')->nullable();
-            $table->string('longitude');
-            $table->string('facility_type');
-            $table->string('facility_subtype')->nullable();
-            $table->string('latitude');
             $table->string('ownership_type');
+            $table->string('ownership_subtype')->nullable();
+            $table->string('facility_type');
+            $table->string('facility_type_code');
+            $table->string('longitude');
+            $table->string('latitude');
             $table->timestamps();
         });
     }
