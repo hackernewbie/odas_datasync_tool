@@ -31,7 +31,9 @@ Route::get('data',function(GoogleSheetService $gsheet){
 
 
 // Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-Route::get('dashboard',[App\Http\Controllers\HomeController::class, 'dashboard'])->name('dashboard');
+Route::get('dashboard',[App\Http\Controllers\BackendController::class, 'dashboard'])->name('dashboard');
+
+Route::get('fascilities',[App\Http\Controllers\BackendController::class,'facilities'])->name('fascilities');
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);

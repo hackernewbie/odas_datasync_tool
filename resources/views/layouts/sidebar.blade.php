@@ -23,12 +23,17 @@
                 </li> --}}
 
                 <li>
-                    <a href="{{route('dashboard')}}" class="waves-effects" target="_blank">
+                    <a href="{{route('dashboard')}}" class="waves-effects">
                         <i class="bx bx-home-circle"></i>
-                        <span key="Sync">@lang('translation.Dashboards')</span>
+                        <span key="Sync">Dashboard</span>
                     </a>
                 </li>
-
+                <li>
+                    <a href="{{route('fascilities')}}" class="waves-effects">
+                        <i class='bx bx-plus-medical'></i>
+                        <span key="Sync">Facilities</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- Sidebar -->

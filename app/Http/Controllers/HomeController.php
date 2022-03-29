@@ -28,16 +28,10 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        if (view()->exists($request->path())) {
-            //return view($request->path());
-            return view('welcome');
-        }
-        return abort(404);
+        return view('welcome');
     }
 
-    public function dashboard(){
-        return view('dashboard');
-    }
+
 
     // public function root()
     // {
