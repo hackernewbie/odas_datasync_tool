@@ -30,12 +30,12 @@
                                     <th class="align-middle" width="10%">ODAS ID</th>
                                     <th class="align-middle" width="10px">Name</th>
                                     <th class="align-middle" max-width="10%">Address</th>
-                                    <th class="align-middle" width="10%">City</th>
-                                    <th class="align-middle" width="10%">District (LGD)</th>
+                                    <th class="align-middle" width="10%">City LGD</th>
+                                    <th class="align-middle" width="10%">District LGD</th>
                                     <th class="align-middle" width="10%">Nodal Officer</th>
                                     <th class="align-middle" width="10%">Ownership Type</th>
                                     <th class="align-middle" width="10%">Facility Type</th>
-                                    <th class="align-middle" width="20%">View Details</th>
+                                    {{-- <th class="align-middle" width="20%">View Details</th> --}}
                                     <th class="align-middle" width="20%">Action</th>
                                 </tr>
                             </thead>
@@ -49,31 +49,32 @@
                                             PIN - {{$item->pincode}}
                                         </td>
                                         <td>
-                                            {{$item->city}}
+                                            {{$item->city_lgd_code}}
                                         </td>
                                         <td>
                                             {{$item->district_lgd_code}}
                                             {{-- <span class="badge badge-pill badge-soft-success font-size-11">Paid</span> --}}
                                         </td>
                                         <td>
-                                            {{$item->FacilityNodalOfficer->officer_name}}
+                                            {{-- {{dd($item->FacilityNodalOfficer->officer_name)}} --}}
+                                            {{$item->FacilityNodalOfficer ? $item->FacilityNodalOfficer->officer_name : 'NA'}}
                                         </td>
                                         <td>
                                             {{-- <i class="fab fa-cc-mastercard me-1"></i> Mastercard --}}
-                                            {{$item->ownership_type}} </br>
+                                            {{$item->ownership_type}}
                                             ({{$item->ownership_subtype}})
                                         </td>
                                         <td>
                                             {{$item->facility_type}}
                                         </td>
-                                        <td>
+                                        {{-- <td>
                                             <!-- Button trigger modal -->
                                             <button type="button"
                                                 class="btn btn-primary btn-sm btn-rounded waves-effect waves-light"
                                                 data-bs-toggle="modal" data-bs-target=".transaction-detailModal">
                                                 View Details
                                             </button>
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             <a href="{{route('odas.facilityid.get')}}" class="btn btn-sm btn-warning">
                                                 Fetch ODAS Facility Ids
@@ -90,13 +91,13 @@
                 </div>
             </div>
 
-            @if(!isset($allFacilities))
+            @if(!isset($allFacilities) || count($allFacilities) == 0)
                 <div class="card">
                     <div class="card-body">
                         <div class="row mx-auto">
                             <div class="col-10">
-                                <a href="{{route('facilities.get')}}" class="btn btn-lg btn-success">
-                                    Fetch Facilities
+                                <a href="{{route('facilities.get')}}" class="btn btn-lg btn-warning">
+                                    Load Facilities
                                 </a>
                             </div>
                         </div>

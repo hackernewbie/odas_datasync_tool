@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::middleware(['auth'])->group(function () {
+    // Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
+    Route::get('dashboard',[App\Http\Controllers\BackendController::class, 'dashboard'])->name('dashboard');
+    Route::get('facilities',[App\Http\Controllers\FacilityController::class,'facilities'])->name('facilities');
+});
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -30,10 +35,7 @@ Route::get('data',function(GoogleSheetService $gsheet){
 });
 
 
-// Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
-Route::get('dashboard',[App\Http\Controllers\BackendController::class, 'dashboard'])->name('dashboard');
 
-Route::get('facilities',[App\Http\Controllers\FacilityController::class,'facilities'])->name('facilities');
 
 Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
 Route::get('facilityid-get',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet

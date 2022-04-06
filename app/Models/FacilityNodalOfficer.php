@@ -17,6 +17,6 @@ class FacilityNodalOfficer extends Model
     ];
 
     public function Facility(){
-        return $this->belongsTo('App\Models\Facility');
+        return $this->belongsTo('App\Models\Facility','facility_information_id');
     }
 }
