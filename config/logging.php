@@ -37,7 +37,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['single','odas_debug','odas_errors'],
             'ignore_exceptions' => false,
         ],
 
@@ -45,6 +45,19 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+        ],
+
+        'odas_debug' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/odas.log'),
+            'level' => 'debug',
+            'buble' => false,
+        ],
+        'odas_errors' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/odas_errors.log'),
+            'level' => 'error',
+            'buble' => false,
         ],
 
         'daily' => [
