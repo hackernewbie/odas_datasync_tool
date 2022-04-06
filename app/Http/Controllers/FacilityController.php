@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use GuzzleHttp\Client;
 use App\Models\Facility;
+use App\Models\ODASToken;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\FacilityNodalOfficer;
 use App\Services\GoogleSheetService;
@@ -26,8 +30,7 @@ class FacilityController extends Controller
         if($listOfFacilities == null || count($listOfFacilities) <= 2){
             return redirect()->back()->with('error','No Data in source Google Sheet Found in Source Google Scheet');
         }
-        // dd(isset($listOfFacilities[9][8]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[9][8]);
-        // dd($listOfFacilities[9][8] !== "" ? $listOfFacilities[9][8] : 'No Data in source Google Sheet');
+
         try{
             DB::beginTransaction();
             /// First Row is info header. Second Row is table Header
@@ -123,8 +126,86 @@ class FacilityController extends Controller
         }
     }
 
-    public function GenerateFacilityId(){
+    public function GenerateFacilityId($hospitalName){
+        try{
+            $odasApiBAseURL                     =   config('odas.odas_base_url');
+            $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
+            $generatedUUID                      =   Str::uuid();
 
-        getODASAccessToken();
+            $facilityBeingProcessed                   =   Facility::where('facility_name',$hospitalName)->first();
+            //dd($facilityBeingProcessed);
+            //dd($facilityBeingProcessed->FacilityNodalOfficer);
+            //dd($facilityBeingProcessed->FacilityNodalOfficer->officer_salutation);
+
+            $newToken                           =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd('success');
+
+            /// Update FacilityInfo
+            $odasTokenToUse           =     $odasToken->token;
+            $params = array(
+                'facility' => [
+                    'address' => [
+                        "addressLine1"              => $facilityBeingProcessed->address_line_1,
+                        "addressLine2"              => $facilityBeingProcessed->address_line_2,
+                        "city"                      => $facilityBeingProcessed->city_lgd_code,
+                        "district"                  => $facilityBeingProcessed->district_lgd_code,
+                        "pincode"                   => $facilityBeingProcessed->pincode,
+                        "state"                     => $facilityBeingProcessed->state_lgd_code,
+                        "subdistrict"               => $facilityBeingProcessed->subdistrict_lgd_code
+                    ],
+                    "facilitysubtype"               => 0,
+                    "facilitytype"                  => $facilityBeingProcessed->facility_type_code,
+                    "id"                            =>  " ",
+                    "langitude"                     => $facilityBeingProcessed->longitude,
+                    "latitude"                      => $facilityBeingProcessed->latitude,
+                    "name"                          => $facilityBeingProcessed->facility_name,
+                    "ownershipsubtype"              => $facilityBeingProcessed->ownership_subtype,
+                    "ownershiptype"                 => $facilityBeingProcessed->ownership_type
+                ],
+                "nodalcontacts" => [
+                    [
+                        "countrycode"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code ? $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code : "+91",
+                        "designation"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_designation,
+                        "email"             => $facilityBeingProcessed->FacilityNodalOfficer->officer_email,
+                        "firstname"         => $facilityBeingProcessed->FacilityNodalOfficer->officer_name,
+                        "lastname"          => '',
+                        "middlename"        => '',
+                        "mobilenumber"      => $facilityBeingProcessed->FacilityNodalOfficer->officer_mobile_number,
+                        "salutation"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_salutation
+                    ]
+                ],
+                "requestId" => $generatedUUID,
+                "timestamp" => $odasToken->timestamp_utc
+             );
+
+            //dd($params);
+
+            $client = new Client();
+
+            $response = $client->post($odasApiBAseURL.$updateFacilityIDEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
+            $dataRes =   json_decode($response->getBody(), true);
+
+            if($dataRes !== null){
+                $facilityToUpdate                       =   Facility::find($facilityBeingProcessed->id);
+                $facilityToUpdate->odas_facility_id     =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
+                $facilityToUpdate->reference_number     =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $facilityToUpdate->status               =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $facilityToUpdate->save();
+                dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
+                /// Save the reference_number, facilityId and status in the local DB
+            }
+        }
+        catch(\Exception $ex){
+            dd($ex->getMessage());
+        }
     }
 }

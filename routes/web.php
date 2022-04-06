@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ODASToken;
 use App\Services\GoogleSheetService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,13 @@ Route::get('data',function(GoogleSheetService $gsheet){
 
 
 Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
-Route::get('facilityid-get',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
+Route::get('facilityid-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
+
+Route::get('date-check', function(){
+    $dateToCheck        =   ODASToken::latest()->first();
+    dd($dateToCheck ? $dateToCheck->updated_at : 'null');
+    //dd($dateToCheck);
+});

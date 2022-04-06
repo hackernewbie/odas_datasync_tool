@@ -76,7 +76,7 @@
                                             </button>
                                         </td> --}}
                                         <td>
-                                            <a href="{{route('odas.facilityid.get')}}" class="btn btn-sm btn-warning">
+                                            <a href="{{route('odas.facilityid.get',$item->facility_name)}}" class="btn btn-sm btn-warning">
                                                 Fetch ODAS Facility Ids
                                             </a>
                                         </td>

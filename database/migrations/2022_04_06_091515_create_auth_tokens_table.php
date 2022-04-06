@@ -15,7 +15,8 @@ class CreateAuthTokensTable extends Migration
     {
         Schema::create('odas_auth_tokens', function (Blueprint $table) {
             $table->id();
-            $table->string('token');
+            $table->longText('token');
+            $table->string('timestamp_utc');
             $table->timestamps();
         });
     }
