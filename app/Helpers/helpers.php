@@ -12,8 +12,8 @@ function getODASAccessToken(){
     //dd($clientId . " : " . $clientSecret);
 
     $data = array(
-        'clientId' => 'ST_MEGHALAYA',
-        'clientSecret' => '19df68dd-f000-4f72-bfa1-3f4e91f42f02',
+        'clientId' => $clientId,
+        'clientSecret' => $clientSecret,
      );
 
     //  $response = Http::post($odasApiBAseURL.'v1.0/odas/get-access-token', [
