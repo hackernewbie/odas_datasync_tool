@@ -36,7 +36,7 @@ Route::get('dashboard',[App\Http\Controllers\BackendController::class, 'dashboar
 Route::get('facilities',[App\Http\Controllers\FacilityController::class,'facilities'])->name('facilities');
 
 Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
-Route::get('facilityid-get',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityIds'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
+Route::get('facilityid-get',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);

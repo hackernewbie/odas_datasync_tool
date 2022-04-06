@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Facility;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\FacilityNodalOfficer;
 use App\Services\GoogleSheetService;
@@ -117,5 +116,10 @@ class FacilityController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors($ex->getMessage())->withInput();
         }
+    }
+
+    public function GenerateFacilityId(){
+
+        getODASAccessToken();
     }
 }
