@@ -17,11 +17,11 @@ class Facility extends Model
 
 
     public function FacilityNodalOfficer(){
-        return $this->hasOne('App\Models\FacilityNodalOfficer');
+        return $this->hasOne('App\Models\FacilityNodalOfficer','facility_information_id');
     }
 
     public function FacilityInfrastructure(){
-        return $this->hasOne('App\Models\FacilityInfrastructure');
+        return $this->hasOne('App\Models\FacilityInfrastructure','facility_information_id');
     }
 
 }

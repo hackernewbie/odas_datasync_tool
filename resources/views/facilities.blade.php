@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css">
 @section('title') Facilities - ODAS Data Sync @endsection
 
 @section('content')
@@ -22,7 +24,7 @@
                 <div class="card-body">
                     <h4 class="card-title mb-4">Facility Details</h4>
                     <div class="table-responsive">
-                        <table class="table align-middle mb-0">
+                        <table id="facilities" class="table table-striped display compact" style="width:100%">
                             <thead class="table-light">
                                 <tr>
                                     <th class="align-middle" width="10%">ODAS ID</th>
@@ -30,6 +32,7 @@
                                     <th class="align-middle" max-width="10%">Address</th>
                                     <th class="align-middle" width="10%">City</th>
                                     <th class="align-middle" width="10%">District (LGD)</th>
+                                    <th class="align-middle" width="10%">Nodal Officer</th>
                                     <th class="align-middle" width="10%">Ownership Type</th>
                                     <th class="align-middle" width="10%">Facility Type</th>
                                     <th class="align-middle" width="20%">View Details</th>
@@ -50,6 +53,9 @@
                                         <td>
                                             {{$item->district_lgd_code}}
                                             {{-- <span class="badge badge-pill badge-soft-success font-size-11">Paid</span> --}}
+                                        </td>
+                                        <td>
+                                            {{$item->FacilityNodalOfficer->officer_name}}
                                         </td>
                                         <td>
                                             {{-- <i class="fab fa-cc-mastercard me-1"></i> Mastercard --}}
@@ -229,4 +235,13 @@
 
     <!-- dashboard init -->
     <script src="{{ URL::asset('/assets/js/pages/dashboard.init.js') }}"></script>
+
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#facilities').DataTable();
+            //alert('hi');
+        } );
+    </script>
 @endsection

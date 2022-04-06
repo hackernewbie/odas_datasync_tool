@@ -1,7 +1,7 @@
 @extends('layouts.master-without-nav')
 
 @section('title')
-    @lang('translation.Register') 2
+    ODAS
 @endsection
 
 @section('css')
@@ -32,11 +32,11 @@
                                             <div class="col-lg-7">
                                                 <div class="text-center">
 
-                                                    <h4 class="mb-3"><i
-                                                            class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i><span
-                                                            class="text-primary">5k</span>+ Satisfied clients</h4>
+                                                    <h4 class="mb-3">
+                                                        {{-- <i class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i> --}}
+                                                            <span class="text-primary">ODAS </span>Data Sync Dashboard</h4>
 
-                                                    <div dir="ltr">
+                                                    {{-- <div dir="ltr">
                                                         <div class="owl-carousel owl-theme auth-review-carousel"
                                                             id="auth-review-carousel">
                                                             <div class="item">
@@ -71,7 +71,7 @@
 
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> --}}
                                                 </div>
                                             </div>
                                         </div>
@@ -117,7 +117,7 @@
                                                 </div>
 
                                                 <div class="mb-3">
-                                                    <label for="username" class="form-label">Username</label>
+                                                    <label for="name" class="form-label">Name</label>
                                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
                                                     value="{{ old('name') }}" id="username" name="name" autofocus required
                                                         placeholder="Enter username">
@@ -150,7 +150,7 @@
                                                     @enderror
                                                 </div>
 
-                                                <div class="mb-3">
+                                                {{-- <div class="mb-3">
                                                     <label for="userdob">Date of Birth</label>
                                                     <div class="input-group" id="datepicker1">
                                                         <input type="text" class="form-control @error('dob') is-invalid @enderror" placeholder="dd-mm-yyyy"
@@ -176,7 +176,7 @@
                                                             <strong>{{ $message }}</strong>
                                                         </span>
                                                     @enderror
-                                                </div>
+                                                </div> --}}
 
                                                 <div class="mt-4 d-grid">
                                                     <button class="btn btn-primary waves-effect waves-light"

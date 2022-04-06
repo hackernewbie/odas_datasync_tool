@@ -1,0 +1,5 @@
+/* Hello from the custom CSS file */
+
+#facilities th, #facilities tbody td{
+    font-size: 13px;
+}

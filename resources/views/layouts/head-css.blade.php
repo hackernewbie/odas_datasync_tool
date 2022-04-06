@@ -7,6 +7,7 @@
 <!-- App Css-->
 <link href="{{ URL::asset('/assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
 
+<link href="{{ URL::asset('/assets/css/custom.css') }}" rel="stylesheet" type="text/css" />
 
 <style type="text/css">
     .alert-error {
