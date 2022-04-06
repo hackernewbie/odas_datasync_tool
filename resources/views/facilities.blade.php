@@ -36,6 +36,7 @@
                                     <th class="align-middle" width="10%">Ownership Type</th>
                                     <th class="align-middle" width="10%">Facility Type</th>
                                     <th class="align-middle" width="20%">View Details</th>
+                                    <th class="align-middle" width="20%">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -73,22 +74,14 @@
                                                 View Details
                                             </button>
                                         </td>
-                                    </tr>
-                                @empty
-                                    <tr>
                                         <td>
-                                            <a href="{{route('facilities.get')}}" class="btn btn-lg btn-success">
-                                                Fetch Facilities
-                                            </a>
-
-                                            <a href="{{route('odas.facilityid.get')}}" class="btn btn-lg btn-warning">
+                                            <a href="{{route('odas.facilityid.get')}}" class="btn btn-sm btn-warning">
                                                 Fetch ODAS Facility Ids
                                             </a>
                                         </td>
-                                        <td class="text-left">
-
-                                        </td>
                                     </tr>
+                                @empty
+                                    {{-- Nothing To Show --}}
                                 @endforelse
                             </tbody>
                         </table>
@@ -96,6 +89,20 @@
                     <!-- end table-responsive -->
                 </div>
             </div>
+
+            @if(!isset($allFacilities))
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row mx-auto">
+                            <div class="col-10">
+                                <a href="{{route('facilities.get')}}" class="btn btn-lg btn-success">
+                                    Fetch Facilities
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
     <!-- end row -->
