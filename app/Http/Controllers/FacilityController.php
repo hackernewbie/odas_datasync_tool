@@ -28,7 +28,7 @@ class FacilityController extends Controller
         $listOfFacilities   =   $gsheet->readGoogleSheet(config('google.facility_sheet_name'));
         //dd($listOfFacilities);
         if($listOfFacilities == null || count($listOfFacilities) <= 2){
-            return redirect()->back()->with('error','No Data in source Google Sheet Found in Source Google Scheet');
+            return redirect()->back()->with('error','Empty Found in Source Google Scheet');
         }
 
         try{
@@ -40,37 +40,37 @@ class FacilityController extends Controller
                 if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                     $odas_facility_id               = null;
                     $facilityName                   = $listOfFacilities[$count][0];
-                    $address_line1                  = isset($listOfFacilities[$count][1]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][1];
-                    $address_line2                  = isset($listOfFacilities[$count][2]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][2];
-                    $city_lgd                       = isset($listOfFacilities[$count][4]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][4];
-                    $district_lgd                   = isset($listOfFacilities[$count][6]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][6];
-                    $pincode                        = isset($listOfFacilities[$count][7]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][7];
-                    $state_lgd                      = isset($listOfFacilities[$count][8]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][8];
+                    $address_line1                  = isset($listOfFacilities[$count][1]) == false ?  'Empty' : $listOfFacilities[$count][1];
+                    $address_line2                  = isset($listOfFacilities[$count][2]) == false ?  'Empty' : $listOfFacilities[$count][2];
+                    $city_lgd                       = isset($listOfFacilities[$count][4]) == false ?  'Empty' : $listOfFacilities[$count][4];
+                    $district_lgd                   = isset($listOfFacilities[$count][6]) == false ?  'Empty' : $listOfFacilities[$count][6];
+                    $pincode                        = isset($listOfFacilities[$count][7]) == false ?  'Empty' : $listOfFacilities[$count][7];
+                    $state_lgd                      = isset($listOfFacilities[$count][8]) == false ?  'Empty' : $listOfFacilities[$count][8];
                     $sub_district_lgd               = isset($listOfFacilities[$count][9]) == false ?  0 : $listOfFacilities[$count][9];
-                    //$ownership_type                 = isset($listOfFacilities[$count][10]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][10];
-                    $ownership_type_code            = isset($listOfFacilities[$count][11]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][11];
-                    $ownership_sub_type_code        = isset($listOfFacilities[$count][13]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][13];
-                    $facility_type                  = isset($listOfFacilities[$count][14]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][14];
-                    $facility_type_code             = isset($listOfFacilities[$count][15]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][15];
+                    //$ownership_type                 = isset($listOfFacilities[$count][10]) == false ?  'Empty' : $listOfFacilities[$count][10];
+                    $ownership_type_code            = isset($listOfFacilities[$count][11]) == false ?  'Empty' : $listOfFacilities[$count][11];
+                    $ownership_sub_type_code        = isset($listOfFacilities[$count][13]) == false ?  'Empty' : $listOfFacilities[$count][13];
+                    $facility_type                  = isset($listOfFacilities[$count][14]) == false ?  'Empty' : $listOfFacilities[$count][14];
+                    $facility_type_code             = isset($listOfFacilities[$count][15]) == false ?  'Empty' : $listOfFacilities[$count][15];
                     /// FacilityId is 16
-                    $longitude                      = isset($listOfFacilities[$count][17]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][17];
-                    $longitude                      = isset($listOfFacilities[$count][18]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][18];
+                    $longitude                      = isset($listOfFacilities[$count][17]) == false ?  'Empty' : $listOfFacilities[$count][17];
+                    $longitude                      = isset($listOfFacilities[$count][18]) == false ?  'Empty' : $listOfFacilities[$count][18];
 
-                    $nodalOfficerName               = isset($listOfFacilities[$count][19]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][19];
-                    $nodalOfficerSalutation         = isset($listOfFacilities[$count][20]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][20];
-                    $nodalOfficerFirstName          = isset($listOfFacilities[$count][21]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][21]);
-                    $nodalOfficerMiddleName         = isset($listOfFacilities[$count][22]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][22]);
-                    $nodalOfficerLastName           = isset($listOfFacilities[$count][23]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][23]);
-                    $nodalOfficerDesignation        = isset($listOfFacilities[$count][24]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][24];
-                    $nodalOfficerCountryCode        = isset($listOfFacilities[$count][25]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][25];
-                    $nodalOfficerMobileNumber       = isset($listOfFacilities[$count][26]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][26];
-                    $nodalOfficerEmail              = isset($listOfFacilities[$count][27]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][27];
+                    $nodalOfficerName               = isset($listOfFacilities[$count][19]) == false ?  'Empty' : $listOfFacilities[$count][19];
+                    $nodalOfficerSalutation         = isset($listOfFacilities[$count][20]) == false ?  'Empty' : $listOfFacilities[$count][20];
+                    $nodalOfficerFirstName          = isset($listOfFacilities[$count][21]) == false ?  'Empty' : SanitizeString($listOfFacilities[$count][21]);
+                    $nodalOfficerMiddleName         = isset($listOfFacilities[$count][22]) == false ?  'Empty' : SanitizeString($listOfFacilities[$count][22]);
+                    $nodalOfficerLastName           = isset($listOfFacilities[$count][23]) == false ?  'Empty' : SanitizeString($listOfFacilities[$count][23]);
+                    $nodalOfficerDesignation        = $listOfFacilities[$count][24]        == ""    ?  'Empty' : $listOfFacilities[$count][24];
+                    $nodalOfficerCountryCode        = isset($listOfFacilities[$count][25]) == false ?  'Empty' : $listOfFacilities[$count][25];
+                    $nodalOfficerMobileNumber       = isset($listOfFacilities[$count][26]) == false ?  'Empty' : $listOfFacilities[$count][26];
+                    $nodalOfficerEmail              = isset($listOfFacilities[$count][27]) == false ?  'Empty' : $listOfFacilities[$count][27];
 
-                    $general_beds_with_o2           = isset($listOfFacilities[$count][28]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][28];
-                    $hdu_beds                       = isset($listOfFacilities[$count][29]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][29];
-                    $icu_beds                       = isset($listOfFacilities[$count][30]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][30];
-                    $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][31];
-                    $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][32];
+                    $general_beds_with_o2           = isset($listOfFacilities[$count][28]) == false ?  'Empty' : $listOfFacilities[$count][28];
+                    $hdu_beds                       = isset($listOfFacilities[$count][29]) == false ?  'Empty' : $listOfFacilities[$count][29];
+                    $icu_beds                       = isset($listOfFacilities[$count][30]) == false ?  'Empty' : $listOfFacilities[$count][30];
+                    $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  'Empty' : $listOfFacilities[$count][31];
+                    $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  'Empty' : $listOfFacilities[$count][32];
 
                     /// Save Data to the Facility Table
                     $createdFacilityInformation     =   Facility::create([
