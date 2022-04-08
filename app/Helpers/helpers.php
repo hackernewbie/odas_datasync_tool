@@ -4,6 +4,10 @@ use App\Models\ODASToken;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Http;
 
+function SanitizeString($inputString){
+    return preg_replace('/[.]/', '', $inputString);
+}
+
 function getODASAccessToken(){
     $clientId       =   config('odas.odas_client_id');
     $clientSecret   =   config('odas.odas_client_secret');

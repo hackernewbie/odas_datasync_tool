@@ -57,17 +57,20 @@ class FacilityController extends Controller
                     $longitude                      = isset($listOfFacilities[$count][18]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][18];
 
                     $nodalOfficerName               = isset($listOfFacilities[$count][19]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][19];
-                    $nodalOfficerDesignation        = isset($listOfFacilities[$count][20]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][20];
-                    $nodalOfficerSalutation         = isset($listOfFacilities[$count][21]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][21];
-                    $nodalOfficerCountryCode        = isset($listOfFacilities[$count][22]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][22];
-                    $nodalOfficerMobileNumber       = isset($listOfFacilities[$count][23]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][23];
-                    $nodalOfficerEmail              = isset($listOfFacilities[$count][24]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][24];
+                    $nodalOfficerSalutation         = isset($listOfFacilities[$count][20]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][20];
+                    $nodalOfficerFirstName          = isset($listOfFacilities[$count][21]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][21]);
+                    $nodalOfficerMiddleName         = isset($listOfFacilities[$count][22]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][22]);
+                    $nodalOfficerLastName           = isset($listOfFacilities[$count][23]) == false ?  'No Data in source Google Sheet' : SanitizeString($listOfFacilities[$count][23]);
+                    $nodalOfficerDesignation        = isset($listOfFacilities[$count][24]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][24];
+                    $nodalOfficerCountryCode        = isset($listOfFacilities[$count][25]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][25];
+                    $nodalOfficerMobileNumber       = isset($listOfFacilities[$count][26]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][26];
+                    $nodalOfficerEmail              = isset($listOfFacilities[$count][27]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][27];
 
-                    $general_beds_with_o2           = isset($listOfFacilities[$count][25]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][25];
-                    $hdu_beds                       = isset($listOfFacilities[$count][26]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][26];
-                    $icu_beds                       = isset($listOfFacilities[$count][27]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][27];
-                    $o2_concentrators               = isset($listOfFacilities[$count][28]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][28];
-                    $ventilators                    = isset($listOfFacilities[$count][29]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][29];
+                    $general_beds_with_o2           = isset($listOfFacilities[$count][28]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][28];
+                    $hdu_beds                       = isset($listOfFacilities[$count][29]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][29];
+                    $icu_beds                       = isset($listOfFacilities[$count][30]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][30];
+                    $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][31];
+                    $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  'No Data in source Google Sheet' : $listOfFacilities[$count][32];
 
                     /// Save Data to the Facility Table
                     $createdFacilityInformation     =   Facility::create([
@@ -92,8 +95,11 @@ class FacilityController extends Controller
                         $createdFacilityNodalOfficer   =    FacilityNodalOfficer::create([
                             'facility_information_id'           =>  $createdFacilityInformation->id,
                             'officer_name'                      =>  $nodalOfficerName,
-                            'officer_designation'               =>  $nodalOfficerDesignation,
                             'officer_salutation'                =>  $nodalOfficerSalutation,
+                            'officer_first_name'                =>  $nodalOfficerFirstName,
+                            'officer_middle_name'               =>  $nodalOfficerMiddleName,
+                            'officer_last_name'                 =>  $nodalOfficerLastName,
+                            'officer_designation'               =>  $nodalOfficerDesignation,
                             'officer_country_code'              =>  $nodalOfficerCountryCode,
                             'officer_mobile_number'             =>  $nodalOfficerMobileNumber,
                             'officer_email'                     =>  $nodalOfficerEmail,
@@ -173,9 +179,9 @@ class FacilityController extends Controller
                         "countrycode"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code ? $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code : "+91",
                         "designation"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_designation,
                         "email"             => $facilityBeingProcessed->FacilityNodalOfficer->officer_email,
-                        "firstname"         => $facilityBeingProcessed->FacilityNodalOfficer->officer_name,
-                        "lastname"          => '',
-                        "middlename"        => '',
+                        "firstname"         => $facilityBeingProcessed->FacilityNodalOfficer->officer_first_name,
+                        "lastname"          => $facilityBeingProcessed->FacilityNodalOfficer->officer_last_name,
+                        "middlename"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_middle_name,
                         "mobilenumber"      => $facilityBeingProcessed->FacilityNodalOfficer->officer_mobile_number,
                         "salutation"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_salutation
                     ]
@@ -195,17 +201,20 @@ class FacilityController extends Controller
             $dataRes =   json_decode($response->getBody(), true);
 
             if($dataRes !== null){
+                /// Save the reference_number, facilityId and status in the local DB
                 $facilityToUpdate                       =   Facility::find($facilityBeingProcessed->id);
                 $facilityToUpdate->odas_facility_id     =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
                 $facilityToUpdate->reference_number     =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
                 $facilityToUpdate->status               =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
                 $facilityToUpdate->save();
-                dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
-                /// Save the reference_number, facilityId and status in the local DB
+                //dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
+
+                return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
         catch(\Exception $ex){
-            dd($ex->getMessage());
+            return redirect()->back()->with('error', $ex->getMessage());
+            //dd($ex->getMessage());
         }
     }
 }

@@ -3,3 +3,12 @@
 #facilities th, #facilities tbody td{
     font-size: 13px;
 }
+
+#facilities .facility_id_column_green{
+    color: darkgreen;
+    font-weight: 600;
+}
+#facilities .facility_id_column_red{
+    color: red;
+    font-weight: 500;
+}

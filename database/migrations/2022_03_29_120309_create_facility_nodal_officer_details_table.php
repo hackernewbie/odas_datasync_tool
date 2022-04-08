@@ -19,8 +19,11 @@ class CreateFacilityNodalOfficerDetailsTable extends Migration
             $table->bigInteger('facility_information_id')->unsigned()->index()->nullable();     // Local Facility Id
             $table->foreign('facility_information_id')->references('id')->on('facility_information')->onDelete('cascade');
             $table->string('officer_name');
-            $table->string('officer_designation');
             $table->string('officer_salutation');
+            $table->string('officer_first_name');
+            $table->string('officer_middle_name')->nullable();
+            $table->string('officer_last_name')->nullable();
+            $table->string('officer_designation');
             $table->string('officer_country_code');
             $table->string('officer_mobile_number');
             $table->string('officer_email');

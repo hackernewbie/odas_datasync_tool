@@ -42,7 +42,7 @@
                             <tbody>
                                 @forelse ($allFacilities as $item)
                                     <tr>
-                                        <td>{{$item->odas_facility_id ? $item->odas_facility_id : 'Not Updated'}}</td>
+                                        <td class="{{$item->odas_facility_id ? 'facility_id_column_green ' : 'facility_id_column_red'}}">{{$item->odas_facility_id ? $item->odas_facility_id : 'Not Updated'}}</td>
                                         <td>{{$item->facility_name}}</td>
                                         <td>
                                             {{$item->address_line_1}},<br/>{{$item->address_line_2}}<br/>
@@ -76,9 +76,13 @@
                                             </button>
                                         </td> --}}
                                         <td>
-                                            <a href="{{route('odas.facilityid.get',$item->facility_name)}}" class="btn btn-sm btn-warning">
-                                                Fetch ODAS Facility Ids
-                                            </a>
+                                            @if ($item->odas_facility_id == null)
+                                                <a href="{{route('odas.facilityid.get',$item->facility_name)}}" class="btn btn-sm btn-warning">
+                                                    Fetch ODAS Facility Ids
+                                                </a>
+                                            @else
+                                                <p>Facility ID Generated</p>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -91,7 +95,7 @@
                 </div>
             </div>
 
-            @if(!isset($allFacilities) || count($allFacilities) == 0)
+            {{-- @if(!isset($allFacilities) || count($allFacilities) == 0) --}}
                 <div class="card">
                     <div class="card-body">
                         <div class="row mx-auto">
@@ -103,7 +107,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            {{-- @endif --}}
         </div>
     </div>
     <!-- end row -->

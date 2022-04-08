@@ -12,7 +12,7 @@ class FacilityNodalOfficer extends Model
     protected $table        =   'facility_nodal_officer_details';
 
     protected $fillable     =   [
-                        'facility_information_id','officer_name','officer_designation','officer_salutation','officer_country_code',
+                        'facility_information_id','officer_name','officer_salutation','officer_first_name','officer_middle_name','officer_last_name','officer_designation','officer_country_code',
                         'officer_mobile_number', 'officer_email','requestId',
     ];
 
