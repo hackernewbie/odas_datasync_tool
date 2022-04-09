@@ -14,6 +14,26 @@ use App\Models\FacilityInfrastructure;
 
 class FacilityController extends Controller
 {
+    public function Oxygen(){
+        $allInOxygenStatus  =   [];
+        return view('oxygen_status')
+            ->with('allInOxygenStatus',$allInOxygenStatus);
+    }
+
+    public function FetchOxygenData(){
+        $gsheet             = new GoogleSheetService();
+
+        $allOxygenData      = $gsheet->readGoogleSheet(config('google.data_for_dashboard'),'BI');
+        dd($allOxygenData);
+
+        //Insert into DB if data not already present else update data
+
+    }
+
+    public function GetOxygenDataByHospital($hospital){
+        dd($hospital);
+    }
+
     public function facilities(){
         //$allFacilities      = Facility::with('FacilityNodalOfficer')->get();
         $allFacilities      = Facility::all();
@@ -24,8 +44,7 @@ class FacilityController extends Controller
 
     public function GetFacilities(){
         $gsheet = new GoogleSheetService();
-
-        $listOfFacilities   =   $gsheet->readGoogleSheet(config('google.facility_sheet_name'));
+        $listOfFacilities   =   $gsheet->readGoogleSheet(config('google.facility_sheet_name'),'AL');
         //dd($listOfFacilities);
         if($listOfFacilities == null || count($listOfFacilities) <= 2){
             return redirect()->back()->with('error','Empty Found in Source Google Scheet');

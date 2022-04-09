@@ -34,6 +34,12 @@
                         <span key="Sync">Facilities</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{route('oxygen')}}" class="waves-effects">
+                        <i class='bx bx-wind'></i>
+                        <span key="Sync">Oxygen Status</span>
+                    </a>
+                </li>
             </ul>
         </div>
         <!-- Sidebar -->

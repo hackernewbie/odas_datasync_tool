@@ -16,7 +16,9 @@ class GoogleSheetService
     public function __construct()
     {
         $this->spreadSheetId = config('google.google_sheet_id');
-        $this->sheetName     = config('google.sheet_name');
+        //$this->sheetName     = config('google.sheet_name');
+        //$this->sheetName       = config('google.facility_sheet_name');
+
         $this->client        = new Google_Client();
         $this->client->setAuthConfig(storage_path('creds.json'));
         $this->client->addScope("https://www.googleapis.com/auth/spreadsheets");
@@ -25,12 +27,24 @@ class GoogleSheetService
 
     }
 
-    public function readGoogleSheet($sheetName)
+    public function readGoogleSheet($sheetName,$rangeEnd)
+    {
+        $range = $sheetName.'!A1:' . $rangeEnd;
+
+        $data = $this->googleSheetService
+            ->spreadsheets_values
+            ->batchGet($this->spreadSheetId, ['ranges' => $range]);
+
+        return $data->getValueRanges()[0]->values;
+    }
+
+    public function readGoogleSheetOriginal($sheetName)
     {
         $dimensions = $this->getDimensions($this->spreadSheetId, $this->sheetName);
         $range = $sheetName.'!A1:' . $dimensions['colCount'];
         //$range = $sheetName.'!A1:' . 'AL';
         //dd($range);
+        //dd($dimensions);
         $data = $this->googleSheetService
             ->spreadsheets_values
             ->batchGet($this->spreadSheetId, ['ranges' => $range]);
@@ -65,6 +79,7 @@ class GoogleSheetService
         //if data is present at nth col, it will return array till nth col
         //if all column values are empty, it returns null
         $colMeta = $colDimensions->getValueRanges()[0]->values;
+        //dd($colDimensions);
         if (!$colMeta) {
             return [
                 'error' => true,

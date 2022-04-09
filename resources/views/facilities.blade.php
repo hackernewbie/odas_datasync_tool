@@ -20,6 +20,7 @@
                 </button>
                 {{session('success')}}
             </div> --}}
+
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Facility Details</h4>
@@ -95,19 +96,17 @@
                 </div>
             </div>
 
-            {{-- @if(!isset($allFacilities) || count($allFacilities) == 0) --}}
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row mx-auto">
-                            <div class="col-10">
-                                <a href="{{route('facilities.get')}}" class="btn btn-lg btn-warning">
-                                    Load Facilities
-                                </a>
-                            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mx-auto">
+                        <div class="col-10">
+                            <a href="{{route('facilities.get')}}" class="btn btn-lg btn-warning">
+                                Load Facilities
+                            </a>
                         </div>
                     </div>
                 </div>
-            {{-- @endif --}}
+            </div>
         </div>
     </div>
     <!-- end row -->

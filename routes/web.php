@@ -22,6 +22,14 @@ Route::middleware(['auth'])->group(function () {
     // Route::get('{any}', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
     Route::get('dashboard',[App\Http\Controllers\BackendController::class, 'dashboard'])->name('dashboard');
     Route::get('facilities',[App\Http\Controllers\FacilityController::class,'facilities'])->name('facilities');
+
+    Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
+    Route::get('facilityid-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
+
+    Route::get('oxygen',[App\Http\Controllers\FacilityController::class,'Oxygen'])->name('oxygen');
+
+    Route::get('syncdata',[App\Http\Controllers\FacilityController::class,'FetchOxygenData'])->name('syncdata');
+    //Route::get('oxygen-data-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'OxygenDataById'])->name('oxygen.data.hospital.get');
 });
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
@@ -32,14 +40,9 @@ Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class
 
 
 Route::get('data',function(GoogleSheetService $gsheet){
-    $gsheet->readGoogleSheet(config('google.sheet_name'));
+    $gsheet->readGoogleSheet(config('google.sheet_name'),'AL');
 });
 
-
-
-
-Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
-Route::get('facilityid-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
