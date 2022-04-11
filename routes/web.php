@@ -26,9 +26,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('facilities-get',[App\Http\Controllers\FacilityController::class, 'GetFacilities'])->name('facilities.get');         /// Fetch data from Google Sheet
     Route::get('facilityid-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'GenerateFacilityId'])->name('odas.facilityid.get');         /// Fetch data from Google Sheet
 
-    Route::get('oxygen',[App\Http\Controllers\FacilityController::class,'Oxygen'])->name('oxygen');
+    Route::get('oxygen',[App\Http\Controllers\OxygenDataController::class,'Oxygen'])->name('oxygen');
 
-    Route::get('syncdata',[App\Http\Controllers\FacilityController::class,'FetchOxygenData'])->name('syncdata');
+    Route::get('syncdata',[App\Http\Controllers\OxygenDataController::class,'FetchOxygenData'])->name('syncdata');
     //Route::get('oxygen-data-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'OxygenDataById'])->name('oxygen.data.hospital.get');
 });
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');

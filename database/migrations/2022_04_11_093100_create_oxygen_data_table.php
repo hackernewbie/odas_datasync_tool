@@ -41,7 +41,7 @@ class CreateOxygenDataTable extends Migration
             $table->string('no_typeD_cylinders_in_transit')->nullable();
             $table->string('no_filled_typeD_cylinders')->nullable();
             $table->string('total_typeD_cylinders')->nullable();
-            $table->string('no_of_consumed_typeB_cylinders_in_last_24_hours')->nullable();
+            $table->string('no_of_consumed_typeD_cylinders_in_last_24_hours')->nullable();
 
             $table->string('o2_typeD_and_typeB_capacity_in_cum')->nullable();
             $table->string('overall_o2_availability_in_cum')->nullable();
@@ -50,13 +50,13 @@ class CreateOxygenDataTable extends Migration
             $table->string('no_of_BiPAP_machines')->nullable();
             $table->string('no_of_o2_concentrators')->nullable();
 
-            
+
             $table->string('unaccounted_typeB')->nullable();
             $table->string('unaccounted_typeD')->nullable();
             $table->string('appx_o2_demand_with_current_load_in_hrs')->nullable();
             $table->string('appx_o2_demand_with_current_no_of_patients_in_cum')->nullable();
             $table->string('appx_o2_demand_with_all_beds_full')->nullable();
-            
+
 
             $table->timestamps();
         });
