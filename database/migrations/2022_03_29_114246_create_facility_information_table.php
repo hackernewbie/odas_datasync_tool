@@ -30,6 +30,8 @@ class CreateFacilityInformationTable extends Migration
             $table->string('facility_type_code');
             $table->string('longitude');
             $table->string('latitude');
+            $table->text('requestId');
+            $table->string('odas_reference_number')->nullable();
             $table->timestamps();
         });
     }

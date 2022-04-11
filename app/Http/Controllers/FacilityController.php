@@ -36,6 +36,14 @@ class FacilityController extends Controller
 
     public function facilities(){
         //$allFacilities      = Facility::with('FacilityNodalOfficer')->get();
+        try{
+            Facility::all();
+        }
+        catch(\Exception $ex){
+            if($ex->getCode() == '42S02'){
+                return redirect('dashboard')->with('Error', "Base Table Missing!");
+            }
+        }
         $allFacilities      = Facility::all();
         //dd($allFacilities);
         return view('facilities')
@@ -54,6 +62,7 @@ class FacilityController extends Controller
             DB::beginTransaction();
             /// First Row is info header. Second Row is table Header
             for($count = 2; $count <= count($listOfFacilities)-1; $count++){
+                $generatedUUID           = Str::uuid();
                 $tempFacilityName        = Facility::where('facility_name',$listOfFacilities[$count][0])->first();
 
                 if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
@@ -107,6 +116,7 @@ class FacilityController extends Controller
                         'facility_type_code'                =>  $facility_type_code,
                         'longitude'                         =>  $longitude,
                         'latitude'                          =>  $longitude,
+                        'requestId'                         =>  $generatedUUID,
                     ]);
 
                     /// Save Data to the Facility Nodal Officer
@@ -122,6 +132,7 @@ class FacilityController extends Controller
                             'officer_country_code'              =>  $nodalOfficerCountryCode,
                             'officer_mobile_number'             =>  $nodalOfficerMobileNumber,
                             'officer_email'                     =>  $nodalOfficerEmail,
+                            'requestId'                         =>  $generatedUUID,
                         ]);
                     }
 
@@ -134,6 +145,7 @@ class FacilityController extends Controller
                             'icu_beds'                          =>  $icu_beds,
                             'o2_concentrators'                  =>  $o2_concentrators,
                             'ventilators'                       =>  $ventilators,
+                            'requestId'                         =>  $generatedUUID,
                         ]);
                     }
                     else{
@@ -155,7 +167,7 @@ class FacilityController extends Controller
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
-            $generatedUUID                      =   Str::uuid();
+            // $generatedUUID                      =   Str::uuid();
 
             $facilityBeingProcessed                   =   Facility::where('facility_name',$hospitalName)->first();
             //dd($facilityBeingProcessed);
@@ -205,7 +217,7 @@ class FacilityController extends Controller
                         "salutation"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_salutation
                     ]
                 ],
-                "requestId" => $generatedUUID,
+                "requestId" => $facilityBeingProcessed->requestId,
                 "timestamp" => $odasToken->timestamp_utc
              );
 
@@ -227,6 +239,8 @@ class FacilityController extends Controller
                 $facilityToUpdate->status               =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
                 $facilityToUpdate->save();
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
+
+                /// Update Facility Infrastructure Data
 
                 return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
