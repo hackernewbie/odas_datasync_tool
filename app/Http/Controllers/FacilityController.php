@@ -217,10 +217,6 @@ class FacilityController extends Controller
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
 
                 /// Update Facility Infrastructure Data
-                //$facilityInfra                      =   $facilityBeingProcessed->FacilityInfrastructure;
-                //dd($facilityToUpdate->FacilityInfrastructure);
-                //$this->UpdateFacilityInfrastructure($facilityToUpdate, $odasToken);
-
                 return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
