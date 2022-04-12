@@ -29,13 +29,13 @@
                             <thead class="table-light">
                                 <tr>
                                     <th class="align-middle" width="10%">ODAS ID</th>
-                                    <th class="align-middle" width="10px">Name</th>
-                                    <th class="align-middle" max-width="10%">Address</th>
-                                    <th class="align-middle" width="10%">City LGD</th>
-                                    <th class="align-middle" width="10%">District LGD</th>
-                                    <th class="align-middle" width="10%">Nodal Officer</th>
+                                    <th class="align-middle" width="10%">Name</th>
+                                    <th class="align-middle" width="10%">Patients on Oxygen</th>
+                                    <th class="align-middle" width="10%">ICU Beds</th>
+                                    <th class="align-middle" width="10%">Total O2 Beds</th>
+                                    {{-- <th class="align-middle" width="10%">Nodal Officer</th>
                                     <th class="align-middle" width="10%">Ownership Type</th>
-                                    <th class="align-middle" width="10%">Facility Type</th>
+                                    <th class="align-middle" width="10%">Facility Type</th> --}}
                                     {{-- <th class="align-middle" width="20%">View Details</th> --}}
                                     <th class="align-middle" width="20%">Action</th>
                                 </tr>
@@ -46,28 +46,16 @@
                                         <td class="{{$item->odas_facility_id ? 'facility_id_column_green ' : 'facility_id_column_red'}}">{{$item->odas_facility_id ? $item->odas_facility_id : 'Not Updated'}}</td>
                                         <td>{{$item->facility_name}}</td>
                                         <td>
-                                            {{$item->address_line_1}},<br/>{{$item->address_line_2}}<br/>
-                                            PIN - {{$item->pincode}}
+                                            {{$item->no_of_patients_on_o2}}
                                         </td>
                                         <td>
-                                            {{$item->city_lgd_code}}
+                                            {{$item->no_of_ICU_beds}}
                                         </td>
                                         <td>
-                                            {{$item->district_lgd_code}}
+                                            {{$item->no_of_o2_supported_beds}}
                                             {{-- <span class="badge badge-pill badge-soft-success font-size-11">Paid</span> --}}
                                         </td>
-                                        <td>
-                                            {{-- {{dd($item->FacilityNodalOfficer->officer_name)}} --}}
-                                            {{$item->FacilityNodalOfficer ? $item->FacilityNodalOfficer->officer_name : 'NA'}}
-                                        </td>
-                                        <td>
-                                            {{-- <i class="fab fa-cc-mastercard me-1"></i> Mastercard --}}
-                                            {{$item->ownership_type}}
-                                            ({{$item->ownership_subtype}})
-                                        </td>
-                                        <td>
-                                            {{$item->facility_type}}
-                                        </td>
+
                                         {{-- <td>
                                             <!-- Button trigger modal -->
                                             <button type="button"
@@ -78,8 +66,8 @@
                                         </td> --}}
                                         <td>
                                             @if ($item->odas_facility_id == null)
-                                                <a href="{{route('odas.facilityid.get',$item->facility_name)}}" class="btn btn-sm btn-warning">
-                                                    Fetch ODAS Facility Ids
+                                                <a href="#" class="btn btn-sm btn-warning">
+                                                    Upload Data To ODAS
                                                 </a>
                                             @else
                                                 <p>Facility ID Generated</p>

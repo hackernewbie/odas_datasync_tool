@@ -74,11 +74,11 @@ class FacilityController extends Controller
                     $nodalOfficerMobileNumber       = isset($listOfFacilities[$count][26]) == false ?  'Empty' : $listOfFacilities[$count][26];
                     $nodalOfficerEmail              = isset($listOfFacilities[$count][27]) == false ?  'Empty' : $listOfFacilities[$count][27];
 
-                    $general_beds_with_o2           = isset($listOfFacilities[$count][28]) == false ?  'Empty' : $listOfFacilities[$count][28];
-                    $hdu_beds                       = isset($listOfFacilities[$count][29]) == false ?  'Empty' : $listOfFacilities[$count][29];
-                    $icu_beds                       = isset($listOfFacilities[$count][30]) == false ?  'Empty' : $listOfFacilities[$count][30];
-                    $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  'Empty' : $listOfFacilities[$count][31];
-                    $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  'Empty' : $listOfFacilities[$count][32];
+                    $general_beds_with_o2           = isset($listOfFacilities[$count][28]) == false ?  0 : $listOfFacilities[$count][28];
+                    $hdu_beds                       = isset($listOfFacilities[$count][29]) == false ?  0 : $listOfFacilities[$count][29];
+                    $icu_beds                       = isset($listOfFacilities[$count][30]) == false ?  0 : $listOfFacilities[$count][30];
+                    $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  0 : $listOfFacilities[$count][31];
+                    $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  0 : $listOfFacilities[$count][32];
 
                     /// Save Data to the Facility Table
                     $createdFacilityInformation     =   Facility::create([
@@ -101,7 +101,8 @@ class FacilityController extends Controller
 
                     /// Save Data to the Facility Nodal Officer
                     if(isset($nodalOfficerName) && $nodalOfficerName != null){
-                        $createdFacilityNodalOfficer   =    FacilityNodalOfficer::create([
+                        $generatedUUID                  = Str::uuid();          /// New UUID being Generated
+                        $createdFacilityNodalOfficer    =    FacilityNodalOfficer::create([
                             'facility_information_id'           =>  $createdFacilityInformation->id,
                             'officer_name'                      =>  $nodalOfficerName,
                             'officer_salutation'                =>  $nodalOfficerSalutation,
@@ -118,13 +119,14 @@ class FacilityController extends Controller
 
                     /// Save Data to the Facility Infrastructure
                     if($general_beds_with_o2 !== null){
-                        $createdFacilityInfrastructure =    FacilityInfrastructure::create([
+                        $generatedUUID                  = Str::uuid();          /// New UUID being Generated
+                        $createdFacilityInfrastructure  =    FacilityInfrastructure::create([
                             'facility_information_id'           =>  $createdFacilityInformation->id,
-                            'general_beds_with_o2'              =>  $general_beds_with_o2,
-                            'hdu_beds'                          =>  $hdu_beds,
-                            'icu_beds'                          =>  $icu_beds,
-                            'o2_concentrators'                  =>  $o2_concentrators,
-                            'ventilators'                       =>  $ventilators,
+                            'general_beds_with_o2'              =>  $general_beds_with_o2 ? $general_beds_with_o2 : 0,
+                            'hdu_beds'                          =>  $hdu_beds ? $hdu_beds : 0,
+                            'icu_beds'                          =>  $icu_beds ? $icu_beds : 0,
+                            'o2_concentrators'                  =>  $o2_concentrators ? $o2_concentrators : 0,
+                            'ventilators'                       =>  $ventilators ? $ventilators : 0,
                             'requestId'                         =>  $generatedUUID,
                         ]);
                     }
@@ -147,12 +149,7 @@ class FacilityController extends Controller
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
-            // $generatedUUID                      =   Str::uuid();
-
-            $facilityBeingProcessed                   =   Facility::where('facility_name',$hospitalName)->first();
-            //dd($facilityBeingProcessed);
-            //dd($facilityBeingProcessed->FacilityNodalOfficer);
-            //dd($facilityBeingProcessed->FacilityNodalOfficer->officer_salutation);
+            $facilityBeingProcessed             =   Facility::where('facility_name',$hospitalName)->first();
 
             $newToken                           =   getODASAccessToken();
 
@@ -213,21 +210,82 @@ class FacilityController extends Controller
 
             if($dataRes !== null){
                 /// Save the reference_number, facilityId and status in the local DB
-                $facilityToUpdate                       =   Facility::find($facilityBeingProcessed->id);
-                $facilityToUpdate->odas_facility_id     =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
-                $facilityToUpdate->reference_number     =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
-                $facilityToUpdate->status               =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $facilityToUpdate                           =   Facility::find($facilityBeingProcessed->id);
+                $facilityToUpdate->odas_facility_id         =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
+                $facilityToUpdate->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $facilityToUpdate->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
                 $facilityToUpdate->save();
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
 
                 /// Update Facility Infrastructure Data
+                //$facilityInfra                      =   $facilityBeingProcessed->FacilityInfrastructure;
+                //dd($facilityToUpdate->FacilityInfrastructure);
+                //$this->UpdateFacilityInfrastructure($facilityToUpdate, $odasToken);
 
                 return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
         catch(\Exception $ex){
             return redirect()->back()->with('error', $ex->getMessage());
-            //dd($ex->getMessage());
+        }
+    }
+
+    public function UpdateFacilityInfrastructure($facilityName){
+        try{
+            $odasApiBAseURL                     =   config('odas.odas_base_url');
+            $updateFacilityBedInfoEndpointURI   =   'v1.0/odas/update-facility-bed-info';
+
+            $facilityToUpdate                   =   Facility::where('facility_name',$facilityName)->first();
+            $facilityInfra                      =   $facilityToUpdate->FacilityInfrastructure;
+
+            $newToken                           =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd($facilityInfra);
+
+            /// Update Facility Bed Info
+            $odasTokenToUse           =     $odasToken->token;
+            $params = array(
+                'beds' => [
+                    "no_gen_beds"                   => $facilityInfra->general_beds_with_o2,
+                    "no_hdu_beds"                   => $facilityInfra->hdu_beds,
+                    "no_icu_beds"                   => $facilityInfra->icu_beds,
+                    "no_o2_concentrators"           => $facilityInfra->o2_concentrators,
+                    "no_vent_beds"                  => $facilityInfra->ventilators,
+                ],
+                "facilityid"    => $facilityToUpdate->odas_facility_id,
+                "requestId"     => $facilityInfra->requestId,
+                "timestamp"     => $odasToken->timestamp_utc
+             );
+
+            //dd($params);
+            //dd($odasApiBAseURL.$updateFacilityBedInfoEndpointURI);
+            $client = new Client();
+            $response = $client->post($odasApiBAseURL.$updateFacilityBedInfoEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
+            //dd($response);
+            $dataRes =   json_decode($response->getBody(), true);
+
+            if($dataRes !== null){
+                /// Save the reference_number, facilityId and status in the local DB
+                $facilityInfrastructureToUpdate                           =   FacilityInfrastructure::find($facilityInfra->id);
+                $facilityInfrastructureToUpdate->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $facilityInfrastructureToUpdate->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $facilityInfrastructureToUpdate->save();
+
+                //dd($dataRes['referencenumber'] . " : " . $dataRes['status']);
+
+                return redirect()->back()->with('success', 'Facility Infrastructures Updated Successfully!');
+            }
+        }
+        catch(\Exception $ex){
+            return redirect()->back()->with('error', $ex->getMessage());
         }
     }
 }

@@ -13,7 +13,7 @@ class FacilityInfrastructure extends Model
 
     protected $fillable     =   [
                         'facility_information_id','general_beds_with_o2','hdu_beds','icu_beds',
-                        'o2_concentrators', 'ventilators','requestId',
+                        'o2_concentrators', 'ventilators','requestId','odas_reference_number','status',
     ];
 
     public function Facility(){

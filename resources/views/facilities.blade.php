@@ -81,8 +81,13 @@
                                                 <a href="{{route('odas.facilityid.get',$item->facility_name)}}" class="btn btn-sm btn-warning">
                                                     Fetch ODAS Facility Ids
                                                 </a>
+                                                &nbsp;
+
                                             @else
                                                 <p>Facility ID Generated</p>
+                                                <a href="{{route('facility.bedinfo.update',$item->facility_name)}}" class="btn btn-sm btn-danger">
+                                                    Update Beds
+                                                </a>
                                             @endif
                                         </td>
                                     </tr>

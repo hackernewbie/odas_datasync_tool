@@ -14,7 +14,7 @@ use App\Models\HealthFacilityAnalysis;
 class OxygenDataController extends Controller
 {
     public function Oxygen(){
-        $allInOxygenStatus  =   [];
+        $allInOxygenStatus  =   HealthFacilityOxygen::all();
         return view('oxygen_status')
             ->with('allInOxygenStatus',$allInOxygenStatus);
     }
