@@ -52,4 +52,8 @@ class HealthFacilityOxygen extends Model
     public function HealthFacilityAnalysis(){
         return $this->hasOne('App\Models\HealthFacilityAnalysis');
     }
+
+    public function Facility(){
+        return $this->belongsTo('App\Models\Facility');
+    }
 }

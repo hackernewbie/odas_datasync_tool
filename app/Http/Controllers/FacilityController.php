@@ -15,7 +15,6 @@ use App\Models\FacilityInfrastructure;
 class FacilityController extends Controller
 {
     public function facilities(){
-        //$allFacilities      = Facility::with('FacilityNodalOfficer')->get();
         try{
             Facility::all();
         }
@@ -263,7 +262,7 @@ class FacilityController extends Controller
              );
 
             //dd($params);
-            //dd($odasApiBAseURL.$updateFacilityBedInfoEndpointURI);
+
             $client = new Client();
             $response = $client->post($odasApiBAseURL.$updateFacilityBedInfoEndpointURI, [
                 'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
@@ -281,7 +280,7 @@ class FacilityController extends Controller
 
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['status']);
 
-                return redirect()->back()->with('success', 'Facility Infrastructures Updated Successfully!');
+                return redirect()->back()->with('success', 'Facility Infrastructure Updated Successfully!');
             }
         }
         catch(\Exception $ex){
