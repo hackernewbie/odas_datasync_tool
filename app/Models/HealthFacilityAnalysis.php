@@ -24,4 +24,8 @@ class HealthFacilityAnalysis extends Model
                                 'typeB_empty_cylinders_to_be_returned',
                                 'typeD_empty_cylinders_to_be_returned',
                                 ];
+
+    public function HealthFacilityOxygen(){
+        return $this->belongsTo('App\Models\HealthFacilityOxygen');
+    }
 }

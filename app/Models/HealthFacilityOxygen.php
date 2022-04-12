@@ -45,6 +45,11 @@ class HealthFacilityOxygen extends Model
                                 'unaccounted_typeD',
                                 'appx_o2_demand_with_current_load_in_hrs',
                                 'appx_o2_demand_with_current_no_of_patients_in_cum',
-                                'appx_o2_demand_with_all_beds_full'
+                                'appx_o2_demand_with_all_beds_full',
+                                'requestId'
                             ];
+
+    public function HealthFacilityAnalysis(){
+        return $this->hasOne('App\Models\HealthFacilityAnalysis');
+    }
 }

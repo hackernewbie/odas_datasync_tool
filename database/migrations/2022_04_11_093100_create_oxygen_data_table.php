@@ -24,7 +24,7 @@ class CreateOxygenDataTable extends Migration
             $table->string('no_of_ICU_beds')->nullable();
             $table->string('no_of_oxygenated_beds_including_ICU')->nullable();
             $table->string('psa_in_lpm')->nullable();
-            $table->boolean('is_active')->nullable();
+            $table->string('is_active')->nullable();
             $table->string('planned_psa_capacity_in_cum')->nullable();
             $table->string('psa_capacity_in_cum');
             $table->string('cryogenic_plant_in_ltr');
@@ -50,14 +50,13 @@ class CreateOxygenDataTable extends Migration
             $table->string('no_of_BiPAP_machines')->nullable();
             $table->string('no_of_o2_concentrators')->nullable();
 
-
             $table->string('unaccounted_typeB')->nullable();
             $table->string('unaccounted_typeD')->nullable();
             $table->string('appx_o2_demand_with_current_load_in_hrs')->nullable();
             $table->string('appx_o2_demand_with_current_no_of_patients_in_cum')->nullable();
             $table->string('appx_o2_demand_with_all_beds_full')->nullable();
 
-
+            $table->text('requestId');
             $table->timestamps();
         });
     }
