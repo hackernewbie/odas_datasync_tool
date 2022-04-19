@@ -12,6 +12,7 @@ class HealthFacilityOxygen extends Model
     protected $table    =   'oxygen_data';
 
     protected $fillable =   [
+                                'facility_information_id',
                                 'odas_facility_id',
                                 'facility_name',
                                 'supply_source',
@@ -54,6 +55,9 @@ class HealthFacilityOxygen extends Model
     }
 
     public function Facility(){
-        return $this->belongsTo('App\Models\Facility');
+        return $this->belongsTo('App\Models\Facility','facility_information_id');
+    }
+    public function FacilityBedInfo(){
+        return $this->hasOne('App\Models\FacilityBedInfo');
     }
 }

@@ -8,6 +8,7 @@ use App\Models\Facility;
 use App\Models\ODASToken;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\FacilityNodalOfficer;
 use App\Services\GoogleSheetService;
 use App\Models\FacilityInfrastructure;
@@ -280,6 +281,8 @@ class FacilityController extends Controller
             }
         }
         catch(\Exception $ex){
+            //dd($ex->getMessage());
+            Log::error('Exception while pushing Facility Infra bed data- ' .$ex->getMessage());
             return redirect()->back()->with('error', $ex->getMessage());
         }
     }

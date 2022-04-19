@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Facility;
+use App\Models\FacilityBedInfo;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use CreateHealthFacilityAnalysis;
@@ -22,8 +23,9 @@ class OxygenDataController extends Controller
     public function FetchOxygenData(){
         $gsheet             = new GoogleSheetService();
 
-        $allOxygenData      = $gsheet->readGoogleSheet(config('google.data_for_dashboard'),'BI');
-        $listOfFacilities   = Facility::select('facility_name','odas_facility_id')->get();
+        $allOxygenData      = $gsheet->readGoogleSheet(config('google.data_for_dashboard'),'BM');
+        $listOfFacilities   = Facility::select('id','facility_name','odas_facility_id')->get();
+
 
         //dd($listOfFacilities);
         //dd($listOfFacilities->where('facility_name','Test Hospital')->first());
@@ -36,6 +38,8 @@ class OxygenDataController extends Controller
         try{
             DB::beginTransaction();
 
+            $occupancyDate      =   $allOxygenData[0][2];
+
             for($count = 2; $count <= count($allOxygenData)-1; $count++){
                 $generatedUUID              = Str::uuid();
 
@@ -45,9 +49,14 @@ class OxygenDataController extends Controller
                                                 ? $listOfFacilities->where('facility_name',$allOxygenData[$count][2])->first()->odas_facility_id
                                                 : null;
 
+                $facilityInfoIdToInsert     =   $listOfFacilities->where('facility_name',$allOxygenData[$count][2])->first()
+                                                ? $listOfFacilities->where('facility_name',$allOxygenData[$count][2])->first()->id
+                                                : null;
 
+                //dd($facilityInfoIdToInsert);
+                /// dump($allOxygenData[$count][2] . " --> " . $facilityInfoIdToInsert);
                 /// dump($allOxygenData[$count][2] . " --> " . $odasFacilityIdToInsert);
-                if($odasFacilityIdToInsert !== null){
+                if($odasFacilityIdToInsert !== null && $facilityInfoIdToInsert !==null){
                     $facilityNameForDB                          =   isset($allOxygenData[$count][2]) == false ?  'Empty' : $allOxygenData[$count][2];
                     $supplySourceForDB                          =   isset($allOxygenData[$count][3]) == false ?  'Empty' : $allOxygenData[$count][3];
                     $timeOfUpdateForDB                          =   isset($allOxygenData[$count][4]) == false ?  'Empty' : $allOxygenData[$count][4];
@@ -80,14 +89,16 @@ class OxygenDataController extends Controller
                     $actualO2AvailabilityInCumForDB             =   isset($allOxygenData[$count][29]) == false ?  'Empty' : $allOxygenData[$count][29];
                     $noOfBipapMachinesForDB                     =   isset($allOxygenData[$count][30]) == false ?  'Empty' : $allOxygenData[$count][30];
                     $noOfO2ConcentratorsForDB                   =   isset($allOxygenData[$count][31]) == false ?  'Empty' : $allOxygenData[$count][31];
-
+                    //dump($noOfO2ConcentratorsForDB);
                     $unaccountedTypeBForDb                      =   isset($allOxygenData[$count][32]) == false ?  'Empty' : $allOxygenData[$count][32];
                     $unaccountedTypeDForDb                      =   isset($allOxygenData[$count][33]) == false ?  'Empty' : $allOxygenData[$count][33];
 
                     $appxDemandWithCurrLoadInHrsForDB           =   isset($allOxygenData[$count][34]) == false ?  'Empty' : $allOxygenData[$count][34];
                     $appxDemandWithCurrNoOfPatientsInCumForDB   =   isset($allOxygenData[$count][35]) == false ?  'Empty' : $allOxygenData[$count][35];
-                    $appDemandWithAllBedsFullForDB              =   isset($allOxygenData[$count][36]) == false ?  'Empty' : $allOxygenData[$count][36];
+                    $appDemandWithAllBedsFullInHrsForDB         =   isset($allOxygenData[$count][36]) == false ?  'Empty' : $allOxygenData[$count][36];
+                    $appDemandWithAllBedsFullInCumForDB         =   isset($allOxygenData[$count][37]) == false ?  'Empty' : $allOxygenData[$count][37];
 
+                    //dd($appDemandWithAllBedsFullInCumForDB);
 
                     /// Analysis Data
                     $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
@@ -102,9 +113,19 @@ class OxygenDataController extends Controller
                     $noOfTypeBEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][47]) == false ?  'Empty' : $allOxygenData[$count][47];
                     $noOfTypeDEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][48]) == false ?  'Empty' : $allOxygenData[$count][48];
 
-                    if($oxygenDataForHosp == null){         /// Add new into oxygen_data
+                    /// Facility Bed Occupancy Info
+                    $noOfGenBedsForDB                                                   =   isset($allOxygenData[$count][49]) == false ?  'Empty' : $allOxygenData[$count][49];
+                    $noOfHDUBedsForDB                                                   =   isset($allOxygenData[$count][50]) == false ?  'Empty' : $allOxygenData[$count][50];
+                    $noOfICUBedsForDB                                                   =   isset($allOxygenData[$count][51]) == false ?  'Empty' : $allOxygenData[$count][51];
+                    $noOfO2ConcentratorsBedInfoForDB                                    =   $noOfO2ConcentratorsForDB;
+                    $noOfVentBedsForDB                                                  =   isset($allOxygenData[$count][52]) == false ?  'Empty' : $allOxygenData[$count][52];
+                    $requestIdForDB                                                     =   $generatedUUID;
 
+
+
+                    if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
                         $createdOxygenData              =   HealthFacilityOxygen::create([
+                            'facility_information_id'                           =>  $facilityInfoIdToInsert,
                             'odas_facility_id'                                  =>  $odasFacilityIdToInsert,
                             'facility_name'                                     =>  $facilityNameForDB,
                             'supply_source'                                     =>  $supplySourceForDB,
@@ -142,10 +163,24 @@ class OxygenDataController extends Controller
                             'unaccounted_typeD'                                 =>  $unaccountedTypeDForDb,
                             'appx_o2_demand_with_current_load_in_hrs'           =>  $appxDemandWithCurrLoadInHrsForDB,
                             'appx_o2_demand_with_current_no_of_patients_in_cum' =>  $appxDemandWithCurrNoOfPatientsInCumForDB,
-                            'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullForDB,
+                            'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullInHrsForDB,
 
                             'requestId'                                         =>  $generatedUUID,
                         ]);
+
+                        $createdFacilityBedInfo             = FacilityBedInfo::create([
+                            'oxygen_data_id'                                =>  $createdOxygenData->id,
+                            'odas_facility_id'                              =>  $odasFacilityIdToInsert,
+                            'no_gen_beds'                                   =>  $noOfGenBedsForDB,
+                            'no_hdu_beds'                                   =>  $noOfHDUBedsForDB,
+                            'no_icu_beds'                                   =>  $noOfICUBedsForDB,
+                            'no_o2_concentrators'                           =>  $noOfO2ConcentratorsBedInfoForDB,
+                            'no_vent_beds'                                  =>  $noOfVentBedsForDB,
+                            'occupancy_date'                                =>  $occupancyDate,
+                            'requestId'                                     =>  $requestIdForDB,
+                        ]);
+
+
                         //dd($createdOxygenData->id);
                         /// Health Facility Analysis Table
                         $createdHealthFacilityAnalysis      = HealthFacilityAnalysis::create([
