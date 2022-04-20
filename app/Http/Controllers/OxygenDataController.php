@@ -304,4 +304,67 @@ class OxygenDataController extends Controller
             return redirect()->back()->with('error', $ex->getMessage());
         }
     }
+
+    public function UpdateFacilityBedOccupancyData($odasFacilityId){
+        Log::debug("Attempting to add Bed Occupancy Data for: " . $odasFacilityId);
+        //dd($hospitalName);
+        try{
+            $odasApiBAseURL                                 =   config('odas.odas_base_url');
+            $updateBedOccupancyEndpointURI                  =   'v1.0/odas/update-bed-occupancy-info';
+            $facilityBeingProcessed                         =   FacilityBedInfo::where('odas_facility_id',$odasFacilityId)->latest()->first();
+            //dd($facilityBeingProcessed);
+
+            $newToken                                       =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd('success');
+            Log::debug("API Auth Token Generated!");
+
+            /// Update Facility O2 Infra API
+            $odasTokenToUse                     =     $odasToken->token;
+            $params = array(
+                "beds" => [
+                    "no_gen_beds"               => $facilityBeingProcessed->no_gen_beds,
+                    "no_hdu_beds"               => $facilityBeingProcessed->no_hdu_beds,
+                    "no_icu_beds"               => $facilityBeingProcessed->no_icu_beds,
+                    "no_o2_concentrators"       => $facilityBeingProcessed->no_o2_concentrators,
+                    "no_vent_beds"              => $facilityBeingProcessed->no_vent_beds,
+                ],
+                "facilityid"                    => $facilityBeingProcessed->odas_facility_id,
+                "occupancyDate"                 => $facilityBeingProcessed->occupancy_date,
+                "requestId"                     => $facilityBeingProcessed->requestId,
+                "timestamp"                     => $odasToken->timestamp_utc
+            );
+
+            //dd($params);
+            $client = new Client();
+            Log::debug("Attempting to push Bed Occupancy] data to API: " . $odasApiBAseURL.$updateBedOccupancyEndpointURI);
+            $response = $client->post($odasApiBAseURL.$updateBedOccupancyEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
+            $dataRes =   json_decode($response->getBody(), true);
+
+            if($dataRes !== null){
+                $facilityBedInfo                           =   FacilityBedInfo::find($facilityBeingProcessed->id);
+                $facilityBedInfo->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $facilityBedInfo->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $facilityBedInfo->save();
+
+                Log::debug('----------------------------------------');
+                Log::debug('Bed Occupany Data Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
+                /// Update Facility Infrastructure Data
+                return redirect()->back()->with('success', 'Bed Occupany Data Updated Successfully!');
+            }
+        }
+        catch(\Exception $ex){
+            Log::error($ex->getMessage());
+            return redirect()->back()->with('error', $ex->getMessage());
+        }
+
+    }
 }

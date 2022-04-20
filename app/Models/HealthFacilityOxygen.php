@@ -62,6 +62,6 @@ class HealthFacilityOxygen extends Model
         return $this->belongsTo('App\Models\Facility','facility_information_id');
     }
     public function FacilityBedInfo(){
-        return $this->hasOne('App\Models\FacilityBedInfo');
+        return $this->hasOne('App\Models\FacilityBedInfo','oxygen_data_id');
     }
 }

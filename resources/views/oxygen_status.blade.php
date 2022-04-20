@@ -67,10 +67,14 @@
                                         <td>
                                             @if ($item->odas_facility_id !== null && $item->status == null)
                                                 <a href="{{route('update.oxygen.data',$item->facility_name)}}" class="btn btn-sm btn-warning">
-                                                    Upload Data To ODAS
+                                                    Update O2 Infra
                                                 </a>
-                                            @else
-                                                <p>Facility ID Generated</p>
+                                            @endif
+
+                                            @if ($item->odas_facility_id !== null && $item->FacilityBedInfo->status == null)
+                                                <a href="{{route('update.facility.bed.occupancy',$item->odas_facility_id)}}" class="btn btn-sm btn-success">
+                                                    Update Bed Occupancy
+                                                </a>
                                             @endif
                                         </td>
                                     </tr>
