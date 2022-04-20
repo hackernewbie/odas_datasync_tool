@@ -64,4 +64,7 @@ class HealthFacilityOxygen extends Model
     public function FacilityBedInfo(){
         return $this->hasOne('App\Models\FacilityBedInfo','oxygen_data_id');
     }
+    public function FacilityOxygenConsumption(){
+        return $this->hasOne('App\Models\FacilityOxygenConsumption','oxygen_data_id');
+    }
 }

@@ -9,6 +9,7 @@ use App\Models\ODASToken;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\FacilityBedInfo;
+use App\Models\FacilityOxygenConsumption;
 use CreateHealthFacilityAnalysis;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,7 +38,11 @@ class OxygenDataController extends Controller
         try{
             DB::beginTransaction();
 
-            $occupancyDate      =   $allOxygenData[0][2];
+            $occupancyDate          =   $allOxygenData[0][2];
+            $yesterdayDate          =   Carbon::parse($occupancyDate)->addDays(-1)->format("Y-m-d");
+
+            $typeBCylinderCapacity  =   1.5;            ///CuM
+            $typeDCylinderCapacity  =   7;              ///CuM
 
             for($count = 2; $count <= count($allOxygenData)-1; $count++){
                 $generatedUUID              = Str::uuid();
@@ -102,9 +107,6 @@ class OxygenDataController extends Controller
                     $appDemandWithAllBedsFullInHrsForDB         =   isset($allOxygenData[$count][36]) == false ?  'Empty' : $allOxygenData[$count][36];
                     $appDemandWithAllBedsFullInCumForDB         =   isset($allOxygenData[$count][37]) == false ?  'Empty' : $allOxygenData[$count][37];
 
-                    //dd($appDemandWithAllBedsFullInCumForDB);
-
-
                     /// Facility Bed Occupancy Info
                     $noOfGenBedsForDB                                                   =   isset($allOxygenData[$count][49]) == false ?  0 : $allOxygenData[$count][49];
                     $noOfHDUBedsForDB                                                   =   isset($allOxygenData[$count][50]) == false ?  0: $allOxygenData[$count][50];
@@ -115,18 +117,22 @@ class OxygenDataController extends Controller
 
 
                     /// Analysis Data
-                    $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
-                    $availableSupplyForDB                                               =   isset($allOxygenData[$count][39]) == false ?  'Empty' : $allOxygenData[$count][39];
-                    $remainingDemandForDB                                               =   isset($allOxygenData[$count][40]) == false ?  'Empty' : $allOxygenData[$count][40];
-                    $supplyInTransitForDB                                               =   isset($allOxygenData[$count][41]) == false ?  'Empty' : $allOxygenData[$count][41];
-                    $remainingDemandAfterFactoringCylindersInTransitForDB               =   isset($allOxygenData[$count][42]) == false ?  'Empty' : $allOxygenData[$count][42];
-                    $capacityOfTypeDEmptyCylindersForDB                                 =   isset($allOxygenData[$count][43]) == false ?  'Empty' : $allOxygenData[$count][43];
-                    $capacityOfTypeBEmptyCylindersAtFacilityForDB                       =   isset($allOxygenData[$count][44]) == false ?  'Empty' : $allOxygenData[$count][44];
-                    $noOfTypeDEmptyCylindersToBeSentForRefillingForDB                   =   isset($allOxygenData[$count][45]) == false ?  'Empty' : $allOxygenData[$count][45];
-                    $noOfTypeBEmptyCylindersToBeSentForRefillingForDB                   =   isset($allOxygenData[$count][46]) == false ?  'Empty' : $allOxygenData[$count][46];
-                    $noOfTypeBEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][47]) == false ?  'Empty' : $allOxygenData[$count][47];
-                    $noOfTypeDEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][48]) == false ?  'Empty' : $allOxygenData[$count][48];
+                    // $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
+                    // $availableSupplyForDB                                               =   isset($allOxygenData[$count][39]) == false ?  'Empty' : $allOxygenData[$count][39];
+                    // $remainingDemandForDB                                               =   isset($allOxygenData[$count][40]) == false ?  'Empty' : $allOxygenData[$count][40];
+                    // $supplyInTransitForDB                                               =   isset($allOxygenData[$count][41]) == false ?  'Empty' : $allOxygenData[$count][41];
+                    // $remainingDemandAfterFactoringCylindersInTransitForDB               =   isset($allOxygenData[$count][42]) == false ?  'Empty' : $allOxygenData[$count][42];
+                    // $capacityOfTypeDEmptyCylindersForDB                                 =   isset($allOxygenData[$count][43]) == false ?  'Empty' : $allOxygenData[$count][43];
+                    // $capacityOfTypeBEmptyCylindersAtFacilityForDB                       =   isset($allOxygenData[$count][44]) == false ?  'Empty' : $allOxygenData[$count][44];
+                    // $noOfTypeDEmptyCylindersToBeSentForRefillingForDB                   =   isset($allOxygenData[$count][45]) == false ?  'Empty' : $allOxygenData[$count][45];
+                    // $noOfTypeBEmptyCylindersToBeSentForRefillingForDB                   =   isset($allOxygenData[$count][46]) == false ?  'Empty' : $allOxygenData[$count][46];
+                    // $noOfTypeBEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][47]) == false ?  'Empty' : $allOxygenData[$count][47];
+                    // $noOfTypeDEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][48]) == false ?  'Empty' : $allOxygenData[$count][48];
 
+                    // dd($typeBConsumedIn24HoursForDB . ' : ' . $typeDConsumedIn24HoursForDB);
+                    /// OxygenFacilityConsuption Data
+                    $totalOxygenConsumedForDB        =  ConvertCuMToMT(($typeBConsumedIn24HoursForDB*$typeBCylinderCapacity) + ($typeDConsumedIn24HoursForDB*$typeDCylinderCapacity));
+                    $totalOxygenGeneratedForDB       =  ConvertCuMToMT(($noOfFilledTypeBCylindersForDB*$typeBCylinderCapacity) + ($noOfFilledTypeDCylindersForDB*$typeDCylinderCapacity));
 
                     if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
                         $createdOxygenData              =   HealthFacilityOxygen::create([
@@ -190,23 +196,31 @@ class OxygenDataController extends Controller
                             'requestId'                                     =>  $requestIdForDB,
                         ]);
 
+                        $createdFacilityOxygenConsumption   =   FacilityOxygenConsumption::create([
+                            'consumption_for_date'              =>  $yesterdayDate,
+                            'consumption_updated_date'          =>  $occupancyDate,
+                            'total_oxygen_consumed'             =>  $totalOxygenConsumedForDB,
+                            'total_oxygen_generated'            =>  $totalOxygenGeneratedForDB,
+                            'odas_facility_id'                  =>  $odasFacilityIdToInsert,
+                            'requestId'                         =>  $generatedUUID
+                        ]);
 
                         //dd($createdOxygenData->id);
                         /// Health Facility Analysis Table
-                        $createdHealthFacilityAnalysis      = HealthFacilityAnalysis::create([
-                            'oxygen_data_id'                                                =>  $createdOxygenData->id,
-                            'demand'                                                        =>  $demandForDB,
-                            'available_supply_at_facility'                                  =>  $availableSupplyForDB,
-                            'remaining_demand_after_exhausting_filled_cylinders'            =>  $remainingDemandForDB,
-                            'supply_in_transit_of_typeB'                                    =>  $supplyInTransitForDB,
-                            'remaining_demand_after_factoring_in_transit_cylinders'         =>  $remainingDemandAfterFactoringCylindersInTransitForDB,
-                            'capacity_of_empty_cylinders_typeD'                             =>  $capacityOfTypeDEmptyCylindersForDB,
-                            'capacity_of_empty_cylinders_typeB'                             =>  $capacityOfTypeBEmptyCylindersAtFacilityForDB,
-                            'no_of_typeD_cylinders_to_refill'                               =>  $noOfTypeDEmptyCylindersToBeSentForRefillingForDB,
-                            'no_of_typeB_cylinders_to_refill_if_demand_unmet_typeB'         =>  $noOfTypeBEmptyCylindersToBeSentForRefillingForDB,
-                            'typeB_empty_cylinders_to_be_returned'                          =>  $noOfTypeBEmptyCylindersToBeReturnedForDB,
-                            'typeD_empty_cylinders_to_be_returned'                          =>  $noOfTypeDEmptyCylindersToBeReturnedForDB,
-                        ]);
+                        // $createdHealthFacilityAnalysis      = HealthFacilityAnalysis::create([
+                        //     'oxygen_data_id'                                                =>  $createdOxygenData->id,
+                        //     'demand'                                                        =>  $demandForDB,
+                        //     'available_supply_at_facility'                                  =>  $availableSupplyForDB,
+                        //     'remaining_demand_after_exhausting_filled_cylinders'            =>  $remainingDemandForDB,
+                        //     'supply_in_transit_of_typeB'                                    =>  $supplyInTransitForDB,
+                        //     'remaining_demand_after_factoring_in_transit_cylinders'         =>  $remainingDemandAfterFactoringCylindersInTransitForDB,
+                        //     'capacity_of_empty_cylinders_typeD'                             =>  $capacityOfTypeDEmptyCylindersForDB,
+                        //     'capacity_of_empty_cylinders_typeB'                             =>  $capacityOfTypeBEmptyCylindersAtFacilityForDB,
+                        //     'no_of_typeD_cylinders_to_refill'                               =>  $noOfTypeDEmptyCylindersToBeSentForRefillingForDB,
+                        //     'no_of_typeB_cylinders_to_refill_if_demand_unmet_typeB'         =>  $noOfTypeBEmptyCylindersToBeSentForRefillingForDB,
+                        //     'typeB_empty_cylinders_to_be_returned'                          =>  $noOfTypeBEmptyCylindersToBeReturnedForDB,
+                        //     'typeD_empty_cylinders_to_be_returned'                          =>  $noOfTypeDEmptyCylindersToBeReturnedForDB,
+                        // ]);
                     }
                     else{
                         /// Update

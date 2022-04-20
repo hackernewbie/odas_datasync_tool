@@ -28,4 +28,8 @@ class Facility extends Model
         return $this->hasOne('App\Models\HealthFacilityOxygen','facility_information_id');
     }
 
+    // public function FacilityOxygenConsumption(){
+    //     return $this->hasOne('App\Models\FacilityOxygenConsumption','facility_information_id');
+    // }
+
 }

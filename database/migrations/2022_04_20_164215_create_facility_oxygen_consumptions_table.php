@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateFacilityBedInfosTable extends Migration
+class CreateFacilityOxygenConsumptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,18 @@ class CreateFacilityBedInfosTable extends Migration
      */
     public function up()
     {
-        Schema::create('facility_bed_info', function (Blueprint $table) {
+        Schema::create('facility_oxygen_consumptions', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('oxygen_data_id')->unsigned()->index()->nullable();
             $table->foreign('oxygen_data_id')->references('id')->on('oxygen_data')->onDelete('cascade');
+            $table->string('consumption_for_date')->nullable();
+            $table->string('consumption_updated_date')->nullable();
+            $table->string('total_oxygen_consumed')->nullable();
+            $table->string('total_oxygen_generated')->nullable();
             $table->string('odas_facility_id')->nullable();
-            $table->string('no_gen_beds')->nullable();
-            $table->string('no_hdu_beds')->nullable();
-            $table->string('no_icu_beds')->nullable();
-            $table->string('no_o2_concentrators')->nullable();
-            $table->string('no_vent_beds')->nullable();
-            $table->string('occupancy_date')->nullable();
-            $table->text('requestId')->nullable();
-
+            $table->string('requestId')->nullable();
+            $table->string('status')->nullable();
+            $table->string('odas_reference_number')->nullable();
             $table->timestamps();
         });
     }
@@ -37,6 +36,6 @@ class CreateFacilityBedInfosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('facility_bed_info');
+        Schema::dropIfExists('facility_oxygen_consumptions');
     }
 }
