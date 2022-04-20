@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Facility;
-use App\Models\FacilityBedInfo;
+use App\Models\ODASToken;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\FacilityBedInfo;
 use CreateHealthFacilityAnalysis;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\HealthFacilityOxygen;
 use App\Services\GoogleSheetService;
 use App\Models\HealthFacilityAnalysis;
@@ -25,11 +28,6 @@ class OxygenDataController extends Controller
 
         $allOxygenData      = $gsheet->readGoogleSheet(config('google.data_for_dashboard'),'BM');
         $listOfFacilities   = Facility::select('id','facility_name','odas_facility_id')->get();
-
-
-        //dd($listOfFacilities);
-        //dd($listOfFacilities->where('facility_name','Test Hospital')->first());
-        //dd($allOxygenData);
 
         if($allOxygenData == null || count($allOxygenData) <= 1){
             return redirect()->back()->with('error','Source Google Sheet Empty');
@@ -68,25 +66,30 @@ class OxygenDataController extends Controller
                     $isActiveForDB                              =   isset($allOxygenData[$count][10]) == false ?  'Empty' : $allOxygenData[$count][10];
                     $plannedPSACapacityInCumForDB               =   isset($allOxygenData[$count][11]) == false ?  'Empty' : $allOxygenData[$count][11];
                     $psaCapacityInCumForDB                      =   isset($allOxygenData[$count][12]) == false ?  'Empty' : $allOxygenData[$count][12];
-                    $cryogenicPlantInLtrForDB                   =   isset($allOxygenData[$count][14]) == false ?  'Empty' : $allOxygenData[$count][14];
-                    $plannedCryoCapacityInCumForDB              =   isset($allOxygenData[$count][15]) == false ?  'Empty' : $allOxygenData[$count][15];
-                    $cryogenicPlantCapacityInCumForDB           =   isset($allOxygenData[$count][16]) == false ?  'Empty' : $allOxygenData[$count][16];
+                    $psaGenerationCapacityInMT                  =   ConvertCuMToMT($psaCapacityInCumForDB);
+                    $psaStorageCapacityInMT                     =   ConvertCuMToMT($psaCapacityInCumForDB);
+                    $cryogenicPlantInLtrForDB                   =   isset($allOxygenData[$count][13]) == false ?  'Empty' : $allOxygenData[$count][13];
+                    $lmoCurrentStorageCapacityInMT              =   ConvertCuMToMT($cryogenicPlantInLtrForDB);
+                    $plannedCryoCapacityInCumForDB              =   isset($allOxygenData[$count][14]) == false ?  'Empty' : $allOxygenData[$count][14];
+                    $cryogenicPlantCapacityInCumForDB           =   isset($allOxygenData[$count][15]) == false ?  'Empty' : $allOxygenData[$count][15];
+                    $lmoCurrentStockInMT                        =   ConvertCuMToMT($cryogenicPlantCapacityInCumForDB);
+                    $lmoStorageCapacityStockInMT                =   ConvertCuMToMT($cryogenicPlantCapacityInCumForDB);
 
-                    $noOfEmptyTypeBCylindersForDB               =   isset($allOxygenData[$count][17]) == false ?  'Empty' : $allOxygenData[$count][17];
-                    $noOfTypeBCylindersInTransitForDB           =   isset($allOxygenData[$count][18]) == false ?  'Empty' : $allOxygenData[$count][18];
-                    $noOfFilledTypeBCylindersForDB              =   isset($allOxygenData[$count][19]) == false ?  'Empty' : $allOxygenData[$count][19];
-                    $totalTypeBCylindersAvailableForDB          =   isset($allOxygenData[$count][20]) == false ?  'Empty' : $allOxygenData[$count][20];
-                    $typeBConsumedIn24HoursForDB                =   isset($allOxygenData[$count][21]) == false ?  'Empty' : $allOxygenData[$count][21];
+                    $noOfEmptyTypeBCylindersForDB               =   isset($allOxygenData[$count][16]) == false ?  'Empty' : $allOxygenData[$count][16];
+                    $noOfTypeBCylindersInTransitForDB           =   isset($allOxygenData[$count][17]) == false ?  'Empty' : $allOxygenData[$count][17];
+                    $noOfFilledTypeBCylindersForDB              =   isset($allOxygenData[$count][18]) == false ?  'Empty' : $allOxygenData[$count][18];
+                    $totalTypeBCylindersAvailableForDB          =   isset($allOxygenData[$count][19]) == false ?  'Empty' : $allOxygenData[$count][19];
+                    $typeBConsumedIn24HoursForDB                =   isset($allOxygenData[$count][20]) == false ?  'Empty' : $allOxygenData[$count][20];
 
-                    $noOfEmptyTypeDCylindersForDB               =   isset($allOxygenData[$count][22]) == false ?  'Empty' : $allOxygenData[$count][22];
-                    $noOfTypeDCylindersInTransitForDB           =   isset($allOxygenData[$count][23]) == false ?  'Empty' : $allOxygenData[$count][23];
-                    $noOfFilledTypeDCylindersForDB              =   isset($allOxygenData[$count][24]) == false ?  'Empty' : $allOxygenData[$count][24];
-                    $totalTypeDCylindersAvailableForDB          =   isset($allOxygenData[$count][25]) == false ?  'Empty' : $allOxygenData[$count][25];
-                    $typeDConsumedIn24HoursForDB                =   isset($allOxygenData[$count][26]) == false ?  'Empty' : $allOxygenData[$count][26];
+                    $noOfEmptyTypeDCylindersForDB               =   isset($allOxygenData[$count][21]) == false ?  'Empty' : $allOxygenData[$count][21];
+                    $noOfTypeDCylindersInTransitForDB           =   isset($allOxygenData[$count][22]) == false ?  'Empty' : $allOxygenData[$count][22];
+                    $noOfFilledTypeDCylindersForDB              =   isset($allOxygenData[$count][23]) == false ?  'Empty' : $allOxygenData[$count][23];
+                    $totalTypeDCylindersAvailableForDB          =   isset($allOxygenData[$count][24]) == false ?  'Empty' : $allOxygenData[$count][24];
+                    $typeDConsumedIn24HoursForDB                =   isset($allOxygenData[$count][25]) == false ?  'Empty' : $allOxygenData[$count][25];
 
-                    $o2TypeDAndTypeBCapacityInCumForDB          =   isset($allOxygenData[$count][27]) == false ?  'Empty' : $allOxygenData[$count][27];
-                    $overallO2AvailabilityInCumForDB            =   isset($allOxygenData[$count][28]) == false ?  'Empty' : $allOxygenData[$count][28];
-                    $actualO2AvailabilityInCumForDB             =   isset($allOxygenData[$count][29]) == false ?  'Empty' : $allOxygenData[$count][29];
+                    $o2TypeDAndTypeBCapacityInCumForDB          =   isset($allOxygenData[$count][26]) == false ?  'Empty' : $allOxygenData[$count][26];
+                    $overallO2AvailabilityInCumForDB            =   isset($allOxygenData[$count][27]) == false ?  'Empty' : $allOxygenData[$count][27];
+                    $actualO2AvailabilityInCumForDB             =   isset($allOxygenData[$count][28]) == false ?  'Empty' : $allOxygenData[$count][28];
                     $noOfBipapMachinesForDB                     =   isset($allOxygenData[$count][30]) == false ?  'Empty' : $allOxygenData[$count][30];
                     $noOfO2ConcentratorsForDB                   =   isset($allOxygenData[$count][31]) == false ?  'Empty' : $allOxygenData[$count][31];
                     //dump($noOfO2ConcentratorsForDB);
@@ -139,8 +142,13 @@ class OxygenDataController extends Controller
                             'is_active'                                         =>  $isActiveForDB,
                             'planned_psa_capacity_in_cum'                       =>  $plannedPSACapacityInCumForDB,
                             'psa_capacity_in_cum'                               =>  $psaCapacityInCumForDB,
+                            'psa_gen_capacity_in_MT'                            =>  $psaGenerationCapacityInMT,
+                            'psa_storage_capacity_in_MT'                        =>  $psaStorageCapacityInMT,
                             'cryogenic_plant_in_ltr'                            =>  $cryogenicPlantInLtrForDB,
+                            'lmo_current_storage_capacity_in_MT'                =>  $lmoCurrentStorageCapacityInMT,
                             'planned_cryogenic_capacity_in_cum'                 =>  $plannedCryoCapacityInCumForDB,
+                            'lmo_current_stock_in_MT'                           =>  $lmoCurrentStockInMT,
+                            'psa_storage_capacity_in_MT'                        =>  $lmoStorageCapacityStockInMT,
                             'cryogenic_capacity_in_cum'                         =>  $cryogenicPlantCapacityInCumForDB,
                             'no_of_empty_typeB_cylinders'                       =>  $noOfEmptyTypeBCylindersForDB,
                             'no_typeB_cylinders_in_transit'                     =>  $noOfTypeBCylindersInTransitForDB,
@@ -219,7 +227,62 @@ class OxygenDataController extends Controller
 
     }
 
-    public function GetOxygenDataByHospital($hospital){
-        dd($hospital);
+    public function UpdateOxygenDataByHospital($hospitalName){
+        Log::debug("Attempting to add Oxygen Data for: " . $hospitalName);
+        //dd($hospitalName);
+        try{
+            $odasApiBAseURL                     =   config('odas.odas_base_url');
+            $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-o2-infra';
+            $facilityBeingProcessed             =   HealthFacilityOxygen::where('facility_name',$hospitalName)->latest()->first();
+            dd($facilityBeingProcessed);
+
+            $newToken                           =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd('success');
+            Log::debug("API Auth Token Generated!");
+
+            /// Update Facility O2 Infra API
+            $odasTokenToUse           =     $odasToken->token;
+            $params = array(
+                "facilityid" => $facilityBeingProcessed->odas_facility_id,
+                "o2Infra" => [
+                    [
+                        "cylinder_a_type_capacity"          => 0,
+                        "cylinder_a_type_yn"                => 'N',
+                        "cylinder_b_type_capacity"          => $facilityBeingProcessed->total_typeD_cylinders,
+                        "cylinder_b_type_yn"                => 'Y',
+                        "cylinder_c20_type_capacity"        => 0,
+                        "cylinder_c20_type_yn"              => 'N',
+                        "cylinder_c35_type_capacity"        => 0,
+                        "cylinder_c35_type_yn"              =>  'N',
+                        "cylinder_c45_type_capacity"        => 0,
+                        "cylinder_c45_type_yn"              =>  'N',
+                        "cylinder_d6_type_capacity"         => 0,
+                        "cylinder_d6_type_yn"               =>  'N',
+                        "cylinder_d7_type_capacity"         => $facilityBeingProcessed->total_typeD_cylinders,
+                        "cylinder_d7_type_yn"               => 'Y',
+                        "lmo_available_yn"                  => 'Y',
+                        "lmo_current_stock"                 => 0.028582,
+                        "lmo_storage_capacity"              => 0.028582,
+                        "psa_available_yn"                  => 'Y',
+                        "psa_gen_capacity"                  => 1.2347424,
+                        "psa_has_mgp_option_yn"             => 'Y',
+                        "psa_has_refil_option_yn"           => 'N',
+                        "psa_has_mgp_option_yn"             => 432,
+                    ]
+                ],
+                "requestId" => $facilityBeingProcessed->requestId,
+                "timestamp" => $odasToken->timestamp_utc
+             );
+        }
+        catch(\Exception $ex){
+            Log::error($ex->getMessage());
+            return redirect()->back()->with('error', $ex->getMessage());
+        }
     }
 }

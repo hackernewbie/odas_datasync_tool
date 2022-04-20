@@ -8,6 +8,11 @@ function SanitizeString($inputString){
     return preg_replace('/[.]/', '', $inputString);
 }
 
+function ConvertCuMToMT($value_in_cum){
+    $valueInMT  =   $value_in_cum*1.4291/1000;
+    return $valueInMT;
+}
+
 function getODASAccessToken(){
     $clientId       =   config('odas.odas_client_id');
     $clientSecret   =   config('odas.odas_client_secret');

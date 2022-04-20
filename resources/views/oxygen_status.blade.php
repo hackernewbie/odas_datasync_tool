@@ -65,8 +65,8 @@
                                             </button>
                                         </td> --}}
                                         <td>
-                                            @if ($item->odas_facility_id == null)
-                                                <a href="#" class="btn btn-sm btn-warning">
+                                            @if ($item->odas_facility_id !== null && $item->status == null)
+                                                <a href="{{route('update.oxygen.data',$item->facility_name)}}" class="btn btn-sm btn-warning">
                                                     Upload Data To ODAS
                                                 </a>
                                             @else
@@ -88,7 +88,7 @@
                 <div class="card-body">
                     <div class="row mx-auto">
                         <div class="col-10">
-                            <a href="{{route('syncdata')}}" class="btn btn-lg btn-warning">
+                            <a href="{{route('fetch.oxygen.data')}}" class="btn btn-lg btn-warning">
                                 Load Oxygen Data
                             </a>
                         </div>
