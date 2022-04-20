@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 use App\Models\Facility;
 use App\Models\ODASToken;
 use Illuminate\Support\Str;
@@ -231,12 +232,12 @@ class OxygenDataController extends Controller
         Log::debug("Attempting to add Oxygen Data for: " . $hospitalName);
         //dd($hospitalName);
         try{
-            $odasApiBAseURL                     =   config('odas.odas_base_url');
-            $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-o2-infra';
-            $facilityBeingProcessed             =   HealthFacilityOxygen::where('facility_name',$hospitalName)->latest()->first();
-            dd($facilityBeingProcessed);
+            $odasApiBAseURL                                 =   config('odas.odas_base_url');
+            $updateFacilityOxygenInfraEndpointURI           =   'v1.0/odas/update-facility-o2-infra';
+            $facilityBeingProcessed                         =   HealthFacilityOxygen::where('facility_name',$hospitalName)->latest()->first();
+            //dd($facilityBeingProcessed);
 
-            $newToken                           =   getODASAccessToken();
+            $newToken                                       =   getODASAccessToken();
 
             // Save the authToken to the DB
             $odasToken                =   new ODASToken();
@@ -251,34 +252,52 @@ class OxygenDataController extends Controller
             $params = array(
                 "facilityid" => $facilityBeingProcessed->odas_facility_id,
                 "o2Infra" => [
-                    [
-                        "cylinder_a_type_capacity"          => 0,
-                        "cylinder_a_type_yn"                => 'N',
-                        "cylinder_b_type_capacity"          => $facilityBeingProcessed->total_typeD_cylinders,
-                        "cylinder_b_type_yn"                => 'Y',
-                        "cylinder_c20_type_capacity"        => 0,
-                        "cylinder_c20_type_yn"              => 'N',
-                        "cylinder_c35_type_capacity"        => 0,
-                        "cylinder_c35_type_yn"              =>  'N',
-                        "cylinder_c45_type_capacity"        => 0,
-                        "cylinder_c45_type_yn"              =>  'N',
-                        "cylinder_d6_type_capacity"         => 0,
-                        "cylinder_d6_type_yn"               =>  'N',
-                        "cylinder_d7_type_capacity"         => $facilityBeingProcessed->total_typeD_cylinders,
-                        "cylinder_d7_type_yn"               => 'Y',
-                        "lmo_available_yn"                  => 'Y',
-                        "lmo_current_stock"                 => 0.028582,
-                        "lmo_storage_capacity"              => 0.028582,
-                        "psa_available_yn"                  => 'Y',
-                        "psa_gen_capacity"                  => 1.2347424,
-                        "psa_has_mgp_option_yn"             => 'Y',
-                        "psa_has_refil_option_yn"           => 'N',
-                        "psa_has_mgp_option_yn"             => 432,
-                    ]
+                    "cylinder_a_type_capacity"          => 0,
+                    "cylinder_a_type_yn"                => 'N',
+                    "cylinder_b_type_capacity"          => $facilityBeingProcessed->total_typeB_cylinders_available,
+                    "cylinder_b_type_yn"                => 'Y',
+                    "cylinder_c20_type_capacity"        => 0,
+                    "cylinder_c20_type_yn"              => 'N',
+                    "cylinder_c35_type_capacity"        => 0,
+                    "cylinder_c35_type_yn"              =>  'N',
+                    "cylinder_c45_type_capacity"        => 0,
+                    "cylinder_c45_type_yn"              =>  'N',
+                    "cylinder_d6_type_capacity"         => 0,
+                    "cylinder_d6_type_yn"               =>  'N',
+                    "cylinder_d7_type_capacity"         => $facilityBeingProcessed->total_typeD_cylinders,
+                    "cylinder_d7_type_yn"               => 'Y',
+                    "lmo_available_yn"                  => 'Y',
+                    "lmo_current_stock"                 => $facilityBeingProcessed->lmo_current_stock_in_MT,
+                    "lmo_storage_capacity"              => $facilityBeingProcessed->lmo_current_stock_in_MT,
+                    "psa_available_yn"                  => $facilityBeingProcessed->is_active == 'TRUE' ? 'Y' : 'N',
+                    "psa_gen_capacity"                  => $facilityBeingProcessed->psa_gen_capacity_in_MT,
+                    "psa_has_mgp_option_yn"             => 'Y',
+                    "psa_has_refil_option_yn"           => 'N',
+                    "psa_storage_capacity"              => $facilityBeingProcessed->psa_storage_capacity_in_MT,
                 ],
                 "requestId" => $facilityBeingProcessed->requestId,
                 "timestamp" => $odasToken->timestamp_utc
-             );
+            );
+            //dd($params);
+            $client = new Client();
+            Log::debug("Attempting to push Oxygen data to API: " . $odasApiBAseURL.$updateFacilityOxygenInfraEndpointURI);
+            $response = $client->post($odasApiBAseURL.$updateFacilityOxygenInfraEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
+            $dataRes =   json_decode($response->getBody(), true);
+
+            if($dataRes !== null){
+                $healthFacilityO2                           =   HealthFacilityOxygen::find($facilityBeingProcessed->id);
+                $healthFacilityO2->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $healthFacilityO2->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $healthFacilityO2->save();
+
+                Log::debug('----------------------------------------');
+                Log::debug('Facility Oxygen Infrastructure Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
+                /// Update Facility Infrastructure Data
+                return redirect()->back()->with('success', 'Facility Oxygen Infrastructure Updated Successfully!');
+            }
         }
         catch(\Exception $ex){
             Log::error($ex->getMessage());
