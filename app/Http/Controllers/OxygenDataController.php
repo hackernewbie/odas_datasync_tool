@@ -100,6 +100,16 @@ class OxygenDataController extends Controller
 
                     //dd($appDemandWithAllBedsFullInCumForDB);
 
+
+                    /// Facility Bed Occupancy Info
+                    $noOfGenBedsForDB                                                   =   isset($allOxygenData[$count][49]) == false ?  0 : $allOxygenData[$count][49];
+                    $noOfHDUBedsForDB                                                   =   isset($allOxygenData[$count][50]) == false ?  0: $allOxygenData[$count][50];
+                    $noOfICUBedsForDB                                                   =   isset($allOxygenData[$count][51]) == false ?  0 : $allOxygenData[$count][51];
+                    $noOfO2ConcentratorsBedInfoForDB                                    =   $noOfO2ConcentratorsForDB;
+                    $noOfVentBedsForDB                                                  =   isset($allOxygenData[$count][52]) == false ?  0 : $allOxygenData[$count][52];
+                    $requestIdForDB                                                     =   $generatedUUID;
+
+
                     /// Analysis Data
                     $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
                     $availableSupplyForDB                                               =   isset($allOxygenData[$count][39]) == false ?  'Empty' : $allOxygenData[$count][39];
@@ -112,15 +122,6 @@ class OxygenDataController extends Controller
                     $noOfTypeBEmptyCylindersToBeSentForRefillingForDB                   =   isset($allOxygenData[$count][46]) == false ?  'Empty' : $allOxygenData[$count][46];
                     $noOfTypeBEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][47]) == false ?  'Empty' : $allOxygenData[$count][47];
                     $noOfTypeDEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][48]) == false ?  'Empty' : $allOxygenData[$count][48];
-
-                    /// Facility Bed Occupancy Info
-                    $noOfGenBedsForDB                                                   =   isset($allOxygenData[$count][49]) == false ?  'Empty' : $allOxygenData[$count][49];
-                    $noOfHDUBedsForDB                                                   =   isset($allOxygenData[$count][50]) == false ?  'Empty' : $allOxygenData[$count][50];
-                    $noOfICUBedsForDB                                                   =   isset($allOxygenData[$count][51]) == false ?  'Empty' : $allOxygenData[$count][51];
-                    $noOfO2ConcentratorsBedInfoForDB                                    =   $noOfO2ConcentratorsForDB;
-                    $noOfVentBedsForDB                                                  =   isset($allOxygenData[$count][52]) == false ?  'Empty' : $allOxygenData[$count][52];
-                    $requestIdForDB                                                     =   $generatedUUID;
-
 
 
                     if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
@@ -171,11 +172,11 @@ class OxygenDataController extends Controller
                         $createdFacilityBedInfo             = FacilityBedInfo::create([
                             'oxygen_data_id'                                =>  $createdOxygenData->id,
                             'odas_facility_id'                              =>  $odasFacilityIdToInsert,
-                            'no_gen_beds'                                   =>  $noOfGenBedsForDB,
-                            'no_hdu_beds'                                   =>  $noOfHDUBedsForDB,
-                            'no_icu_beds'                                   =>  $noOfICUBedsForDB,
-                            'no_o2_concentrators'                           =>  $noOfO2ConcentratorsBedInfoForDB,
-                            'no_vent_beds'                                  =>  $noOfVentBedsForDB,
+                            'no_gen_beds'                                   =>  $noOfGenBedsForDB ? $noOfGenBedsForDB : 0,
+                            'no_hdu_beds'                                   =>  $noOfHDUBedsForDB ? $noOfHDUBedsForDB : 0,
+                            'no_icu_beds'                                   =>  $noOfICUBedsForDB ? $noOfICUBedsForDB : 0,
+                            'no_o2_concentrators'                           =>  $noOfO2ConcentratorsBedInfoForDB ? $noOfO2ConcentratorsBedInfoForDB : 0,
+                            'no_vent_beds'                                  =>  $noOfVentBedsForDB ? $noOfVentBedsForDB : 0,
                             'occupancy_date'                                =>  $occupancyDate,
                             'requestId'                                     =>  $requestIdForDB,
                         ]);

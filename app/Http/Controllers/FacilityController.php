@@ -17,34 +17,38 @@ class FacilityController extends Controller
 {
     public function facilities(){
         try{
-            Facility::all();
+            Log::debug("Loading Facilities Page...");
+            $allFacilities      = Facility::all();
         }
         catch(\Exception $ex){
             if($ex->getCode() == '42S02'){
                 return redirect('dashboard')->with('Error', "Base Table Missing!");
             }
         }
-        $allFacilities      = Facility::all();
+
         //dd($allFacilities);
         return view('facilities')
                 ->with('allFacilities',$allFacilities);
     }
 
     public function GetFacilities(){
-        $gsheet = new GoogleSheetService();
+        Log::debug("Attempting to read data from Facility Information Sheet.");
+        $gsheet             = new GoogleSheetService();
         $listOfFacilities   =   $gsheet->readGoogleSheet(config('google.facility_sheet_name'),'AL');
         //dd($listOfFacilities);
         if($listOfFacilities == null || count($listOfFacilities) <= 2){
+            Log::error("No Data in aFacility Information Sheet.");
             return redirect()->back()->with('error','Source Google Sheet Empty');
         }
 
         try{
+            Log::debug("Reading Facility Information Sheet Data For Insertion");
             DB::beginTransaction();
             /// First Row is info header. Second Row is table Header
             for($count = 2; $count <= count($listOfFacilities)-1; $count++){
                 $generatedUUID           = Str::uuid();
-                $tempFacilityName        = Facility::where('facility_name',$listOfFacilities[$count][0])->first();
-
+                $tempFacilityName        = Facility::where('facility_name',$listOfFacilities[$count][0])->latest()->first();
+                Log::debug("Processing Facility: " . $tempFacilityName);
                 if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                     $odas_facility_id               = null;
                     $facilityName                   = $listOfFacilities[$count][0];
@@ -98,6 +102,7 @@ class FacilityController extends Controller
                         'latitude'                          =>  $longitude,
                         'requestId'                         =>  $generatedUUID,
                     ]);
+                    Log::debug("Facility Information Data Inserted to DB. Facility Name: " . $createdFacilityInformation->id . ' - ' . $facilityName);
 
                     /// Save Data to the Facility Nodal Officer
                     if(isset($nodalOfficerName) && $nodalOfficerName != null){
@@ -115,6 +120,7 @@ class FacilityController extends Controller
                             'officer_email'                     =>  $nodalOfficerEmail,
                             'requestId'                         =>  $generatedUUID,
                         ]);
+                        Log::debug("Nodal Officer Data Inserted to DB. Nodal Officer : " . $createdFacilityNodalOfficer->id . ' - ' . ($nodalOfficerName));
                     }
 
                     /// Save Data to the Facility Infrastructure
@@ -129,6 +135,7 @@ class FacilityController extends Controller
                             'ventilators'                       =>  $ventilators ? $ventilators : 0,
                             'requestId'                         =>  $generatedUUID,
                         ]);
+                        Log::debug("Facility Infrastructure Data Inserted to DB. Facility Infra ID : " . $createdFacilityInfrastructure->id);
                     }
                     else{
                         /// Skipping because no nodal officer name
@@ -136,20 +143,23 @@ class FacilityController extends Controller
                 }
             }
             DB::commit();
+            Log::debug("Facility Information Fetched!");
             return redirect()->back()->with('success', 'Facility Information Fetched!');
         }
 
         catch(\Exception $ex){
             DB::rollback();
+            Log::error($ex->getMessage());
             return redirect()->back()->withErrors($ex->getMessage())->withInput();
         }
     }
 
     public function GenerateFacilityId($hospitalName){
+        Log::debug("Attempting to generate FacilityId for: " . $hospitalName);
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
-            $facilityBeingProcessed             =   Facility::where('facility_name',$hospitalName)->first();
+            $facilityBeingProcessed             =   Facility::where('facility_name',$hospitalName)->latest()->first();
 
             $newToken                           =   getODASAccessToken();
 
@@ -159,6 +169,7 @@ class FacilityController extends Controller
             $odasToken->timestamp_utc =   Carbon::now()->toJSON();
             $odasToken->save();
             //dd('success');
+            Log::debug("API Auth Token Generated!");
 
             /// Update FacilityInfo
             $odasTokenToUse           =     $odasToken->token;
@@ -201,7 +212,7 @@ class FacilityController extends Controller
             //dd($params);
 
             $client = new Client();
-
+            Log::debug("Attempting to push data to API: " . $odasApiBAseURL.$updateFacilityIDEndpointURI);
             $response = $client->post($odasApiBAseURL.$updateFacilityIDEndpointURI, [
                 'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
                 'body'    => json_encode($params)
@@ -217,11 +228,14 @@ class FacilityController extends Controller
                 $facilityToUpdate->save();
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['odasfacilityid'] . " : " . $dataRes['status']);
 
+                Log::debug('----------------------------------------');
+                Log::debug('Facility Id Fetched and Updated in Database Successfully!' . ' - ' .$dataRes['odasfacilityid']);
                 /// Update Facility Infrastructure Data
                 return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
         catch(\Exception $ex){
+            Log::error($ex->getMessage());
             return redirect()->back()->with('error', $ex->getMessage());
         }
     }
