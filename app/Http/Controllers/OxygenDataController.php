@@ -197,6 +197,7 @@ class OxygenDataController extends Controller
                         ]);
 
                         $createdFacilityOxygenConsumption   =   FacilityOxygenConsumption::create([
+                            'oxygen_data_id'                    =>  $createdOxygenData->id,
                             'consumption_for_date'              =>  $yesterdayDate,
                             'consumption_updated_date'          =>  $occupancyDate,
                             'total_oxygen_consumed'             =>  $totalOxygenConsumedForDB,
@@ -379,6 +380,9 @@ class OxygenDataController extends Controller
             Log::error($ex->getMessage());
             return redirect()->back()->with('error', $ex->getMessage());
         }
+    }
 
+    public function UpdateFacilitO2ConsumptionData($odasFacilityId){
+        dd($odasFacilityId);
     }
 }

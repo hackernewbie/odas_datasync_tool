@@ -12,7 +12,7 @@ class FacilityOxygenConsumption extends Model
     protected $table  =       'facility_oxygen_consumptions';
 
     protected $fillable  =       [
-        'facility_information_id',
+        'oxygen_data_id',
         'consumption_for_date',
         'consumption_updated_date',
         'total_oxygen_consumed',

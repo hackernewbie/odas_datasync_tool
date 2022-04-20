@@ -76,6 +76,12 @@
                                                     Update Bed Occupancy
                                                 </a>
                                             @endif
+
+                                            @if ($item->odas_facility_id !== null && $item->FacilityOxygenConsumption->status == null)
+                                                <a href="{{route('update.facility.oxygen.consumption',$item->odas_facility_id)}}" class="btn btn-sm btn-info">
+                                                    Update Bed Occupancy
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
