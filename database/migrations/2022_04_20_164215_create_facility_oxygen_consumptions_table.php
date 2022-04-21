@@ -20,6 +20,7 @@ class CreateFacilityOxygenConsumptionsTable extends Migration
             $table->string('consumption_for_date')->nullable();
             $table->string('consumption_updated_date')->nullable();
             $table->string('total_oxygen_consumed')->nullable();
+            $table->string('total_oxygen_delivered')->nullable();
             $table->string('total_oxygen_generated')->nullable();
             $table->string('odas_facility_id')->nullable();
             $table->string('requestId')->nullable();

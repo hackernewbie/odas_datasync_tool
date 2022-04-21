@@ -37,7 +37,7 @@
                                     <th class="align-middle" width="10%">Ownership Type</th>
                                     <th class="align-middle" width="10%">Facility Type</th> --}}
                                     {{-- <th class="align-middle" width="20%">View Details</th> --}}
-                                    <th class="align-middle" width="20%">Action</th>
+                                    <th class="align-middle" width="40%">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -77,9 +77,15 @@
                                                 </a>
                                             @endif
 
-                                            @if ($item->odas_facility_id !== null && $item->FacilityOxygenConsumption->status == null)
-                                                <a href="{{route('update.facility.oxygen.consumption',$item->odas_facility_id)}}" class="btn btn-sm btn-info">
+                                            @if ($item->odas_facility_id !== null)
+                                                <a href="#" class="btn btn-sm btn-info">
                                                     Update Bed Occupancy
+                                                </a>
+                                            @endif
+
+                                            @if ($item->odas_facility_id !== null && $item->FacilityOxygenConsumption->status == null)
+                                                <a href="{{route('update.facility.oxygen.consumption',$item->odas_facility_id)}}" class="btn btn-sm btn-danger">
+                                                    Update O2 Consumption
                                                 </a>
                                             @endif
                                         </td>
@@ -99,7 +105,7 @@
                     <div class="row mx-auto">
                         <div class="col-10">
                             <a href="{{route('fetch.oxygen.data')}}" class="btn btn-lg btn-warning">
-                                Load Oxygen Data
+                                Get Latest Oxygen Data
                             </a>
                         </div>
                     </div>

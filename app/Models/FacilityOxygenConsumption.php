@@ -16,6 +16,7 @@ class FacilityOxygenConsumption extends Model
         'consumption_for_date',
         'consumption_updated_date',
         'total_oxygen_consumed',
+        'total_oxygen_delivered',
         'total_oxygen_generated',
         'odas_facility_id',
         'requestId',

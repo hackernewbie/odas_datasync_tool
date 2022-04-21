@@ -8,7 +8,7 @@ use App\Models\Facility;
 use App\Models\ODASToken;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\FacilityBedInfo;
+use App\Models\oxygenConsumptionInfo;
 use App\Models\FacilityOxygenConsumption;
 use CreateHealthFacilityAnalysis;
 use Illuminate\Support\Facades\DB;
@@ -132,7 +132,8 @@ class OxygenDataController extends Controller
                     // dd($typeBConsumedIn24HoursForDB . ' : ' . $typeDConsumedIn24HoursForDB);
                     /// OxygenFacilityConsuption Data
                     $totalOxygenConsumedForDB        =  ConvertCuMToMT(($typeBConsumedIn24HoursForDB*$typeBCylinderCapacity) + ($typeDConsumedIn24HoursForDB*$typeDCylinderCapacity));
-                    $totalOxygenGeneratedForDB       =  ConvertCuMToMT(($noOfFilledTypeBCylindersForDB*$typeBCylinderCapacity) + ($noOfFilledTypeDCylindersForDB*$typeDCylinderCapacity));
+                    $totalOxygenDeliveredForDB       =  ConvertCuMToMT(($noOfFilledTypeBCylindersForDB*$typeBCylinderCapacity) + ($noOfFilledTypeDCylindersForDB*$typeDCylinderCapacity));
+                    $totalOxygenGeneratedForDB       =  ConvertCuMToMT($psaCapacityInCumForDB);
 
                     if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
                         $createdOxygenData              =   HealthFacilityOxygen::create([
@@ -184,7 +185,7 @@ class OxygenDataController extends Controller
                             'requestId'                                         =>  $generatedUUID,
                         ]);
 
-                        $createdFacilityBedInfo             = FacilityBedInfo::create([
+                        $createdoxygenConsumptionInfo             = oxygenConsumptionInfo::create([
                             'oxygen_data_id'                                =>  $createdOxygenData->id,
                             'odas_facility_id'                              =>  $odasFacilityIdToInsert,
                             'no_gen_beds'                                   =>  $noOfGenBedsForDB ? $noOfGenBedsForDB : 0,
@@ -201,6 +202,7 @@ class OxygenDataController extends Controller
                             'consumption_for_date'              =>  $yesterdayDate,
                             'consumption_updated_date'          =>  $occupancyDate,
                             'total_oxygen_consumed'             =>  $totalOxygenConsumedForDB,
+                            'total_oxygen_delivered'            =>  $totalOxygenDeliveredForDB,
                             'total_oxygen_generated'            =>  $totalOxygenGeneratedForDB,
                             'odas_facility_id'                  =>  $odasFacilityIdToInsert,
                             'requestId'                         =>  $generatedUUID
@@ -326,7 +328,7 @@ class OxygenDataController extends Controller
         try{
             $odasApiBAseURL                                 =   config('odas.odas_base_url');
             $updateBedOccupancyEndpointURI                  =   'v1.0/odas/update-bed-occupancy-info';
-            $facilityBeingProcessed                         =   FacilityBedInfo::where('odas_facility_id',$odasFacilityId)->latest()->first();
+            $facilityBeingProcessed                         =   oxygenConsumptionInfo::where('odas_facility_id',$odasFacilityId)->latest()->first();
             //dd($facilityBeingProcessed);
 
             $newToken                                       =   getODASAccessToken();
@@ -365,10 +367,10 @@ class OxygenDataController extends Controller
             $dataRes =   json_decode($response->getBody(), true);
 
             if($dataRes !== null){
-                $facilityBedInfo                           =   FacilityBedInfo::find($facilityBeingProcessed->id);
-                $facilityBedInfo->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
-                $facilityBedInfo->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
-                $facilityBedInfo->save();
+                $oxygenConsumptionInfo                           =   oxygenConsumptionInfo::find($facilityBeingProcessed->id);
+                $oxygenConsumptionInfo->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $oxygenConsumptionInfo->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $oxygenConsumptionInfo->save();
 
                 Log::debug('----------------------------------------');
                 Log::debug('Bed Occupany Data Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
@@ -382,7 +384,63 @@ class OxygenDataController extends Controller
         }
     }
 
-    public function UpdateFacilitO2ConsumptionData($odasFacilityId){
-        dd($odasFacilityId);
+    public function UpdateFacilityO2ConsumptionData($odasFacilityId){
+        Log::debug("Attempting to push O2 Consumtion Data for: " . $odasFacilityId);
+        try{
+            $odasApiBAseURL                                 =   config('odas.odas_base_url');
+            $updateO2ConsumptionEndpointURI                 =   'v1.0/odas/update-facility-oxygen-consumption';
+            $facilityOxygenBeingProcessed                   =   FacilityOxygenConsumption::where('odas_facility_id',$odasFacilityId)->latest()->first();
+            //dd($facilityBeingProcessed);
+
+            $newToken                                       =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd('success');
+            Log::debug("API Auth Token Generated!");
+
+            /// Update Facility O2 Infra API
+            $odasTokenToUse                     =     $odasToken->token;
+            $params = array(
+                "consumptionInfo" => [
+                    "consumption_for_date"              => $facilityOxygenBeingProcessed->consumption_for_date,
+                    "consumption_updated_date"          => $facilityOxygenBeingProcessed->consumption_updated_date,
+                    "total_oxygen_consumed"             => $facilityOxygenBeingProcessed->total_oxygen_consumed,
+                    "total_oxygen_delivered"            => $facilityOxygenBeingProcessed->total_oxygen_delivered,
+                    "total_oxygen_generated"            => $facilityOxygenBeingProcessed->total_oxygen_generated,
+                ],
+                "facilityid"                    => $facilityOxygenBeingProcessed->odas_facility_id,
+                "requestId"                     => $facilityOxygenBeingProcessed->requestId,
+                "timestamp"                     => $odasToken->timestamp_utc
+            );
+
+            //dd($params);
+            $client = new Client();
+            Log::debug("Attempting to push O2 consumption data to API: " . $odasApiBAseURL.$updateO2ConsumptionEndpointURI);
+            $response = $client->post($odasApiBAseURL.$updateO2ConsumptionEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
+            $dataRes =   json_decode($response->getBody(), true);
+
+            if($dataRes !== null){
+                $oxygenConsumptionInfo                           =   FacilityOxygenConsumption::find($facilityOxygenBeingProcessed->id);
+                $oxygenConsumptionInfo->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $oxygenConsumptionInfo->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $oxygenConsumptionInfo->save();
+
+                Log::debug('----------------------------------------');
+                Log::debug('Oxygen Consumption Data Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
+                /// Update Facility Infrastructure Data
+                return redirect()->back()->with('success', 'Oxygen Consumption Data Updated Successfully!');
+            }
+        }
+        catch(\Exception $ex){
+            Log::error($ex->getMessage());
+            return redirect()->back()->with('error', $ex->getMessage());
+        }
     }
 }

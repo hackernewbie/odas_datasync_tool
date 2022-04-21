@@ -34,7 +34,7 @@ Route::middleware(['auth'])->group(function () {
     //Route::get('oxygen-data-get/{hospital_name}',[App\Http\Controllers\FacilityController::class, 'OxygenDataById'])->name('oxygen.data.hospital.get');
     Route::get('SendOxygenDataToAPI/{hospital_name}',[App\Http\Controllers\OxygenDataController::class,'UpdateOxygenDataByHospital'])->name('update.oxygen.data');
     Route::get('SendBedOccupancyDataToAPI/{odas_facility_id}',[App\Http\Controllers\OxygenDataController::class,'UpdateFacilityBedOccupancyData'])->name('update.facility.bed.occupancy');
-    Route::get('SendO2ConsumptionDataToAPI/{odas_facility_id}',[App\Http\Controllers\OxygenDataController::class,'UpdateFacilitO2ConsumptionData'])->name('update.facility.oxygen.consumption');
+    Route::get('SendO2ConsumptionDataToAPI/{odas_facility_id}',[App\Http\Controllers\OxygenDataController::class,'UpdateFacilityO2ConsumptionData'])->name('update.facility.oxygen.consumption');
 
 });
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
