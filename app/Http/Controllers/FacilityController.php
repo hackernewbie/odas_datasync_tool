@@ -48,8 +48,11 @@ class FacilityController extends Controller
             for($count = 2; $count <= count($listOfFacilities)-1; $count++){
                 $generatedUUID           = Str::uuid();
                 $tempFacilityName        = Facility::where('facility_name',$listOfFacilities[$count][0])->latest()->first();
+
                 Log::debug("Processing Facility: " . $tempFacilityName);
-                if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
+
+                //if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
+                if(isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                     $odas_facility_id               = null;
                     $facilityName                   = $listOfFacilities[$count][0];
                     $address_line1                  = isset($listOfFacilities[$count][1]) == false ?  'Empty' : $listOfFacilities[$count][1];
@@ -84,8 +87,8 @@ class FacilityController extends Controller
                     $o2_concentrators               = isset($listOfFacilities[$count][31]) == false ?  0 : $listOfFacilities[$count][31];
                     $ventilators                    = isset($listOfFacilities[$count][32]) == false ?  0 : $listOfFacilities[$count][32];
 
-                    /// Save Data to the Facility Table
-                    $createdFacilityInformation     =   Facility::create([
+
+                    $facilityParamsForDB            =   [
                         'facility_name'                     =>  $facilityName,
                         'address_line_1'                    =>  $address_line1,
                         'address_line_2'                    =>  $address_line2,
@@ -101,7 +104,12 @@ class FacilityController extends Controller
                         'longitude'                         =>  $longitude,
                         'latitude'                          =>  $longitude,
                         'requestId'                         =>  $generatedUUID,
-                    ]);
+                    ];
+                }
+
+                if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
+                    $createdFacilityInformation     =   Facility::create($facilityParamsForDB);
+
                     Log::debug("Facility Information Data Inserted to DB. Facility Name: " . $createdFacilityInformation->id . ' - ' . $facilityName);
 
                     /// Save Data to the Facility Nodal Officer
@@ -137,12 +145,52 @@ class FacilityController extends Controller
                         ]);
                         Log::debug("Facility Infrastructure Data Inserted to DB. Facility Infra ID : " . $createdFacilityInfrastructure->id);
                     }
-                    else{
-                        /// Skipping because no nodal officer name
-                    }
                 }
+                else if($tempFacilityName !== null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
+                    Log::debug('Processing for update: ' . $tempFacilityName);
+                    //dd('In update');
+                    $facilityToUpdate                =  $tempFacilityName;
+                    $facilityToUpdate->update($facilityParamsForDB);
+                    /// Update Facility Nodal Officer Data
+                    if($facilityToUpdate->FacilityNodalOfficer->id !==null){
+                        //dd(FacilityNodalOfficer::find($facilityToUpdate->FacilityNodalOfficer->id));
+                        $generatedUUID                  = Str::uuid();
+
+                        $nodalOfficerToUpdate           = FacilityNodalOfficer::find($facilityToUpdate->FacilityNodalOfficer->id)->update([
+                            'officer_name'                      =>  $nodalOfficerName,
+                            'officer_salutation'                =>  $nodalOfficerSalutation,
+                            'officer_first_name'                =>  $nodalOfficerFirstName,
+                            'officer_middle_name'               =>  $nodalOfficerMiddleName,
+                            'officer_last_name'                 =>  $nodalOfficerLastName,
+                            'officer_designation'               =>  $nodalOfficerDesignation,
+                            'officer_country_code'              =>  $nodalOfficerCountryCode,
+                            'officer_mobile_number'             =>  $nodalOfficerMobileNumber,
+                            'officer_email'                     =>  $nodalOfficerEmail,
+                            'requestId'                         =>  $generatedUUID,
+                        ]);
+                        Log::debug("Nodal Officer Data Updated in DB. Nodal Officer : " . $facilityToUpdate->FacilityNodalOfficer->id . ' - ' . ($nodalOfficerName));
+                    }
+
+                    /// Save Data to the Facility Infrastructure
+                    if($general_beds_with_o2 !== null && $facilityToUpdate->FacilityInfrastructure->id !=null ){
+                        $generatedUUID                  = Str::uuid();          /// New UUID being Generated
+
+                        $facilityInfraToUpdate  =    FacilityInfrastructure::find($facilityToUpdate->FacilityInfrastructure->id)->update([
+                            'general_beds_with_o2'              =>  $general_beds_with_o2 ? $general_beds_with_o2 : 0,
+                            'hdu_beds'                          =>  $hdu_beds ? $hdu_beds : 0,
+                            'icu_beds'                          =>  $icu_beds ? $icu_beds : 0,
+                            'o2_concentrators'                  =>  $o2_concentrators ? $o2_concentrators : 0,
+                            'ventilators'                       =>  $ventilators ? $ventilators : 0,
+                            'requestId'                         =>  $generatedUUID,
+                        ]);
+                        Log::debug("Facility Infrastructure Data Updated in DB. Facility Infra ID : " . $facilityToUpdate->FacilityInfrastructure->id);
+                    }
+
+                    Log::debug("Facility Information Data Updated in DB. Facility Name: " . $tempFacilityName->id . ' - ' . $facilityName);
+                }
+                DB::commit();
             }
-            DB::commit();
+            //DB::commit();
             Log::debug("Facility Information Fetched!");
             return redirect()->back()->with('success', 'Facility Information Fetched!');
         }

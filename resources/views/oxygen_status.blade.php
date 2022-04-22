@@ -67,25 +67,25 @@
                                         <td>
                                             @if ($item->odas_facility_id !== null && $item->status == null)
                                                 <a href="{{route('update.oxygen.data',$item->facility_name)}}" class="btn btn-sm btn-warning">
-                                                    Update O2 Infra
+                                                    Push O2 Infra
                                                 </a>
                                             @endif
 
                                             @if ($item->odas_facility_id !== null && $item->FacilityBedInfo->status == null)
                                                 <a href="{{route('update.facility.bed.occupancy',$item->odas_facility_id)}}" class="btn btn-sm btn-success">
-                                                    Update Bed Occupancy
+                                                    Push Bed Occupancy
                                                 </a>
                                             @endif
 
                                             @if ($item->odas_facility_id !== null)
                                                 <a href="#" class="btn btn-sm btn-info">
-                                                    Update Bed Occupancy
+                                                    Push O2 Demand
                                                 </a>
                                             @endif
 
                                             @if ($item->odas_facility_id !== null && $item->FacilityOxygenConsumption->status == null)
                                                 <a href="{{route('update.facility.oxygen.consumption',$item->odas_facility_id)}}" class="btn btn-sm btn-danger">
-                                                    Update O2 Consumption
+                                                    Push O2 Consumption
                                                 </a>
                                             @endif
                                         </td>

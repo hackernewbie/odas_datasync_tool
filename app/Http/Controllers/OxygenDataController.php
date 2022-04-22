@@ -130,61 +130,64 @@ class OxygenDataController extends Controller
                     // $noOfTypeDEmptyCylindersToBeReturnedForDB                           =   isset($allOxygenData[$count][48]) == false ?  'Empty' : $allOxygenData[$count][48];
 
                     // dd($typeBConsumedIn24HoursForDB . ' : ' . $typeDConsumedIn24HoursForDB);
-                    
+
                     /// OxygenFacilityConsuption Data
                     $totalOxygenConsumedForDB        =  ConvertCuMToMT(($typeBConsumedIn24HoursForDB*$typeBCylinderCapacity) + ($typeDConsumedIn24HoursForDB*$typeDCylinderCapacity));
                     $totalOxygenDeliveredForDB       =  ConvertCuMToMT(($noOfFilledTypeBCylindersForDB*$typeBCylinderCapacity) + ($noOfFilledTypeDCylindersForDB*$typeDCylinderCapacity));
                     $totalOxygenGeneratedForDB       =  ConvertCuMToMT($psaCapacityInCumForDB);
 
+
+                    $oxygenParamsForDB                    =   [
+                        'facility_information_id'                           =>  $facilityInfoIdToInsert,
+                        'odas_facility_id'                                  =>  $odasFacilityIdToInsert,
+                        'facility_name'                                     =>  $facilityNameForDB,
+                        'supply_source'                                     =>  $supplySourceForDB,
+                        'time_of_update'                                    =>  $timeOfUpdateForDB,
+                        'no_of_patients_on_o2'                              =>  $noOfPatientsOnO2,
+                        'no_of_o2_supported_beds'                           =>  $o2SupportedBedsForDB,
+                        'no_of_ICU_beds'                                    =>  $icuBedsForDB,
+                        'no_of_oxygenated_beds_including_ICU'               =>  $noOfOxygenatedBedsIncludingICUForDB,
+                        'psa_in_lpm'                                        =>  $psaInLmuForDB,
+                        'is_active'                                         =>  $isActiveForDB,
+                        'planned_psa_capacity_in_cum'                       =>  $plannedPSACapacityInCumForDB,
+                        'psa_capacity_in_cum'                               =>  $psaCapacityInCumForDB,
+                        'psa_gen_capacity_in_MT'                            =>  $psaGenerationCapacityInMT,
+                        'psa_storage_capacity_in_MT'                        =>  $psaStorageCapacityInMT,
+                        'cryogenic_plant_in_ltr'                            =>  $cryogenicPlantInLtrForDB,
+                        'lmo_current_storage_capacity_in_MT'                =>  $lmoCurrentStorageCapacityInMT,
+                        'planned_cryogenic_capacity_in_cum'                 =>  $plannedCryoCapacityInCumForDB,
+                        'lmo_current_stock_in_MT'                           =>  $lmoCurrentStockInMT,
+                        'psa_storage_capacity_in_MT'                        =>  $lmoStorageCapacityStockInMT,
+                        'cryogenic_capacity_in_cum'                         =>  $cryogenicPlantCapacityInCumForDB,
+                        'no_of_empty_typeB_cylinders'                       =>  $noOfEmptyTypeBCylindersForDB,
+                        'no_typeB_cylinders_in_transit'                     =>  $noOfTypeBCylindersInTransitForDB,
+                        'no_filled_typeB_cylinders'                         =>  $noOfFilledTypeBCylindersForDB,
+                        'total_typeB_cylinders_available'                   =>  $totalTypeBCylindersAvailableForDB,
+                        'no_of_consumed_typeB_cylinders_in_last_24_hours'   =>  $typeBConsumedIn24HoursForDB,
+
+                        'no_of_empty_typeD_cylinders'                       =>  $noOfEmptyTypeDCylindersForDB,
+                        'no_typeD_cylinders_in_transit'                     =>  $noOfTypeDCylindersInTransitForDB,
+                        'no_filled_typeD_cylinders'                         =>  $noOfFilledTypeDCylindersForDB,
+                        'total_typeD_cylinders'                             =>  $totalTypeDCylindersAvailableForDB,
+                        'no_of_consumed_typeD_cylinders_in_last_24_hours'   =>  $typeDConsumedIn24HoursForDB,
+
+                        'o2_typeD_and_typeB_capacity_in_cum'                =>  $o2TypeDAndTypeBCapacityInCumForDB,
+                        'overall_o2_availability_in_cum'                    =>  $overallO2AvailabilityInCumForDB,
+                        'actual_o2_availability_in_cum'                     =>  $actualO2AvailabilityInCumForDB,
+                        'no_of_BiPAP_machines'                              =>  $noOfBipapMachinesForDB,
+                        'no_of_o2_concentrators'                            =>  $noOfO2ConcentratorsForDB,
+
+                        'unaccounted_typeB'                                 =>  $unaccountedTypeBForDb,
+                        'unaccounted_typeD'                                 =>  $unaccountedTypeDForDb,
+                        'appx_o2_demand_with_current_load_in_hrs'           =>  $appxDemandWithCurrLoadInHrsForDB,
+                        'appx_o2_demand_with_current_no_of_patients_in_cum' =>  $appxDemandWithCurrNoOfPatientsInCumForDB,
+                        'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullInHrsForDB,
+
+                        'requestId'                                         =>  $generatedUUID,
+                    ];
+
                     if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
-                        $createdOxygenData              =   HealthFacilityOxygen::create([
-                            'facility_information_id'                           =>  $facilityInfoIdToInsert,
-                            'odas_facility_id'                                  =>  $odasFacilityIdToInsert,
-                            'facility_name'                                     =>  $facilityNameForDB,
-                            'supply_source'                                     =>  $supplySourceForDB,
-                            'time_of_update'                                    =>  $timeOfUpdateForDB,
-                            'no_of_patients_on_o2'                              =>  $noOfPatientsOnO2,
-                            'no_of_o2_supported_beds'                           =>  $o2SupportedBedsForDB,
-                            'no_of_ICU_beds'                                    =>  $icuBedsForDB,
-                            'no_of_oxygenated_beds_including_ICU'               =>  $noOfOxygenatedBedsIncludingICUForDB,
-                            'psa_in_lpm'                                        =>  $psaInLmuForDB,
-                            'is_active'                                         =>  $isActiveForDB,
-                            'planned_psa_capacity_in_cum'                       =>  $plannedPSACapacityInCumForDB,
-                            'psa_capacity_in_cum'                               =>  $psaCapacityInCumForDB,
-                            'psa_gen_capacity_in_MT'                            =>  $psaGenerationCapacityInMT,
-                            'psa_storage_capacity_in_MT'                        =>  $psaStorageCapacityInMT,
-                            'cryogenic_plant_in_ltr'                            =>  $cryogenicPlantInLtrForDB,
-                            'lmo_current_storage_capacity_in_MT'                =>  $lmoCurrentStorageCapacityInMT,
-                            'planned_cryogenic_capacity_in_cum'                 =>  $plannedCryoCapacityInCumForDB,
-                            'lmo_current_stock_in_MT'                           =>  $lmoCurrentStockInMT,
-                            'psa_storage_capacity_in_MT'                        =>  $lmoStorageCapacityStockInMT,
-                            'cryogenic_capacity_in_cum'                         =>  $cryogenicPlantCapacityInCumForDB,
-                            'no_of_empty_typeB_cylinders'                       =>  $noOfEmptyTypeBCylindersForDB,
-                            'no_typeB_cylinders_in_transit'                     =>  $noOfTypeBCylindersInTransitForDB,
-                            'no_filled_typeB_cylinders'                         =>  $noOfFilledTypeBCylindersForDB,
-                            'total_typeB_cylinders_available'                   =>  $totalTypeBCylindersAvailableForDB,
-                            'no_of_consumed_typeB_cylinders_in_last_24_hours'   =>  $typeBConsumedIn24HoursForDB,
-
-                            'no_of_empty_typeD_cylinders'                       =>  $noOfEmptyTypeDCylindersForDB,
-                            'no_typeD_cylinders_in_transit'                     =>  $noOfTypeDCylindersInTransitForDB,
-                            'no_filled_typeD_cylinders'                         =>  $noOfFilledTypeDCylindersForDB,
-                            'total_typeD_cylinders'                             =>  $totalTypeDCylindersAvailableForDB,
-                            'no_of_consumed_typeD_cylinders_in_last_24_hours'   =>  $typeDConsumedIn24HoursForDB,
-
-                            'o2_typeD_and_typeB_capacity_in_cum'                =>  $o2TypeDAndTypeBCapacityInCumForDB,
-                            'overall_o2_availability_in_cum'                    =>  $overallO2AvailabilityInCumForDB,
-                            'actual_o2_availability_in_cum'                     =>  $actualO2AvailabilityInCumForDB,
-                            'no_of_BiPAP_machines'                              =>  $noOfBipapMachinesForDB,
-                            'no_of_o2_concentrators'                            =>  $noOfO2ConcentratorsForDB,
-
-                            'unaccounted_typeB'                                 =>  $unaccountedTypeBForDb,
-                            'unaccounted_typeD'                                 =>  $unaccountedTypeDForDb,
-                            'appx_o2_demand_with_current_load_in_hrs'           =>  $appxDemandWithCurrLoadInHrsForDB,
-                            'appx_o2_demand_with_current_no_of_patients_in_cum' =>  $appxDemandWithCurrNoOfPatientsInCumForDB,
-                            'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullInHrsForDB,
-
-                            'requestId'                                         =>  $generatedUUID,
-                        ]);
+                        $createdOxygenData              =   HealthFacilityOxygen::create($oxygenParamsForDB);
 
                         $createdFacilityBedInfo             = FacilityBedInfo::create([
                             'oxygen_data_id'                                =>  $createdOxygenData->id,
