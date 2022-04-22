@@ -229,16 +229,49 @@ class OxygenDataController extends Controller
                         //     'typeD_empty_cylinders_to_be_returned'                          =>  $noOfTypeDEmptyCylindersToBeReturnedForDB,
                         // ]);
                     }
-                    else{
+                    elseif($oxygenDataForHosp !== null) {
                         /// Update
+
+                        Log::debug('Processing for update: ' . $oxygenDataForHosp);
+                        $OxygenDataForHospToUpdate                  =   $oxygenDataForHosp;
+                        $OxygenDataForHospToUpdate->update($oxygenParamsForDB);
+
+                        Log::debug('Oxygen data updated successfully!');
+
+                        //dd($OxygenDataForHospToUpdate->FacilityBedInfo->id);
+                        $facilityBedInfoUpdating             = FacilityBedInfo::find($OxygenDataForHospToUpdate->FacilityBedInfo->id)->update([
+                            'odas_facility_id'                              =>  $odasFacilityIdToInsert,
+                            'no_gen_beds'                                   =>  $noOfGenBedsForDB ? $noOfGenBedsForDB : 0,
+                            'no_hdu_beds'                                   =>  $noOfHDUBedsForDB ? $noOfHDUBedsForDB : 0,
+                            'no_icu_beds'                                   =>  $noOfICUBedsForDB ? $noOfICUBedsForDB : 0,
+                            'no_o2_concentrators'                           =>  $noOfO2ConcentratorsBedInfoForDB ? $noOfO2ConcentratorsBedInfoForDB : 0,
+                            'no_vent_beds'                                  =>  $noOfVentBedsForDB ? $noOfVentBedsForDB : 0,
+                            'occupancy_date'                                =>  $occupancyDate,
+                            'requestId'                                     =>  $requestIdForDB,
+                        ]);
+                        Log::debug('Facility Bed Info Updated: ' . $OxygenDataForHospToUpdate->FacilityBedInfo->id);
+                        //dd($OxygenDataForHospToUpdate);
+
+                        $facilityOxygenConsumptionUpdating   =   FacilityOxygenConsumption::find($OxygenDataForHospToUpdate->FacilityOxygenConsumption->id)->update([
+                            'consumption_for_date'              =>  $yesterdayDate,
+                            'consumption_updated_date'          =>  $occupancyDate,
+                            'total_oxygen_consumed'             =>  $totalOxygenConsumedForDB,
+                            'total_oxygen_delivered'            =>  $totalOxygenDeliveredForDB,
+                            'total_oxygen_generated'            =>  $totalOxygenGeneratedForDB,
+                            'odas_facility_id'                  =>  $odasFacilityIdToInsert,
+                            'requestId'                         =>  $generatedUUID
+                        ]);
+                        Log::debug('Facility Oxygen Consumption Info Updated: ' . $OxygenDataForHospToUpdate->FacilityOxygenConsumption->id);
+
                     }
+                    DB::commit();
                 }
                 else{
                     /// No ODAS Facility ID in DB, generate ID first.
                 }
             }
             //dd("stop");
-            DB::commit();
+            //DB::commit();
             return redirect()->back()->with('success', 'Oxygen Data Fetched!');
         }
         catch(\Exception $ex){
@@ -251,12 +284,10 @@ class OxygenDataController extends Controller
 
     public function UpdateOxygenDataByHospital($hospitalName){
         Log::debug("Attempting to push Oxygen Data To ODAS for: " . $hospitalName);
-        //dd($hospitalName);
         try{
             $odasApiBAseURL                                 =   config('odas.odas_base_url');
             $updateFacilityOxygenInfraEndpointURI           =   'v1.0/odas/update-facility-o2-infra';
             $facilityBeingProcessed                         =   HealthFacilityOxygen::where('facility_name',$hospitalName)->latest()->first();
-            //dd($facilityBeingProcessed);
 
             $newToken                                       =   getODASAccessToken();
 
@@ -315,7 +346,7 @@ class OxygenDataController extends Controller
                 $healthFacilityO2->save();
 
                 Log::debug('----------------------------------------');
-                Log::debug('Facility Oxygen Infrastructure Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
+                Log::debug('Facility Oxygen Infrastructure Updated to ODAS Successfully!' . ' - ' .$dataRes['referencenumber']);
                 /// Update Facility Infrastructure Data
                 return redirect()->back()->with('success', 'Facility Oxygen Infrastructure Updated Successfully!');
             }

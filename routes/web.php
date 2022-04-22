@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Facility;
 use App\Models\ODASToken;
 use App\Services\GoogleSheetService;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +36,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('SendOxygenDataToAPI/{hospital_name}',[App\Http\Controllers\OxygenDataController::class,'UpdateOxygenDataByHospital'])->name('update.oxygen.data');
     Route::get('SendBedOccupancyDataToAPI/{odas_facility_id}',[App\Http\Controllers\OxygenDataController::class,'UpdateFacilityBedOccupancyData'])->name('update.facility.bed.occupancy');
     Route::get('SendO2ConsumptionDataToAPI/{odas_facility_id}',[App\Http\Controllers\OxygenDataController::class,'UpdateFacilityO2ConsumptionData'])->name('update.facility.oxygen.consumption');
+
+
+    /// Bulk Updates
+    Route::get('BulkO2InfraPush',[App\Http\Controllers\BulkUpdatesController::class, 'BulkUpdateFacilityO2Infra'])->name('o2.onfra.bulk.update');
 
 });
 // Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');

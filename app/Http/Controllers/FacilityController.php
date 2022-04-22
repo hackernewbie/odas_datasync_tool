@@ -51,7 +51,6 @@ class FacilityController extends Controller
 
                 Log::debug("Processing Facility: " . $tempFacilityName);
 
-                //if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                 if(isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                     $odas_facility_id               = null;
                     $facilityName                   = $listOfFacilities[$count][0];
