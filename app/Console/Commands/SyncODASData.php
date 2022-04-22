@@ -39,5 +39,6 @@ class SyncODASData extends Command
     public function handle()
     {
         Log::debug('SyncaData command fired');
+        app('App\Http\Controllers\FacilityController@GetFacilities')->everyMinute();
     }
 }
