@@ -22,6 +22,7 @@ class FacilityController extends Controller
         }
         catch(\Exception $ex){
             if($ex->getCode() == '42S02'){
+                Log::debug("ERROR!! Base Table Missing!");
                 return redirect('dashboard')->with('Error', "Base Table Missing!");
             }
         }
@@ -106,7 +107,7 @@ class FacilityController extends Controller
                     ];
                 }
 
-                if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
+                if($tempFacilityName == null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][17]) && isset($listOfFacilities[$count][18]) && isset($listOfFacilities[$count][19]) == true){
                     $createdFacilityInformation     =   Facility::create($facilityParamsForDB);
 
                     Log::debug("Facility Information Data Inserted to DB. Facility Name: " . $createdFacilityInformation->id . ' - ' . $facilityName);
@@ -202,6 +203,7 @@ class FacilityController extends Controller
     }
 
     public function GenerateFacilityId($hospitalName){
+        Log::debug('-------------------------------------------------------');
         Log::debug("Attempting to generate FacilityId for: " . $hospitalName);
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
@@ -216,7 +218,7 @@ class FacilityController extends Controller
             $odasToken->timestamp_utc =   Carbon::now()->toJSON();
             $odasToken->save();
             //dd('success');
-            Log::debug("API Auth Token Generated!");
+            Log::debug("API Auth Token Generated!!");
 
             /// Update FacilityInfo
             $odasTokenToUse           =     $odasToken->token;

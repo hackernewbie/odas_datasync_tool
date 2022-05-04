@@ -36,7 +36,7 @@
                                     <th class="align-middle" width="10%">Nodal Officer</th>
                                     <th class="align-middle" width="10%">Ownership Type</th>
                                     <th class="align-middle" width="10%">Facility Type</th>
-                                    {{-- <th class="align-middle" width="20%">View Details</th> --}}
+                                    <th class="align-middle" width="20%">Last Updated</th>
                                     <th class="align-middle" width="20%">Action</th>
                                 </tr>
                             </thead>
@@ -67,6 +67,9 @@
                                         </td>
                                         <td>
                                             {{$item->facility_type}}
+                                        </td>
+                                        <td>
+                                            {{\Carbon\Carbon::parse($item->updated_at)->format('d, M y H:i:s')}}
                                         </td>
                                         {{-- <td>
                                             <!-- Button trigger modal -->
