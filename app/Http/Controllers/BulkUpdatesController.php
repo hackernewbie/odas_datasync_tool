@@ -47,7 +47,8 @@ class BulkUpdatesController extends Controller
                     Log::debug('No facility Id assigned for ' . $facility->facility_name.'. Generating ODAS FacilityID.');
 
                     app('App\Http\Controllers\FacilityController')->GenerateFacilityId($facility->facility_name);
-
+                    /// Update the Log table
+                    ProcessesRun::create(['description' => 'Facility Id Generation Process Run.','status' => 'Success']);
                     Log::debug('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_');
                 }
             }
