@@ -41,6 +41,20 @@
                                     <th class="align-middle" width="10%">ICU Beds</th>
                                     <th class="align-middle" width="10%">O2 Concentrators</th>
                                     <th class="align-middle" width="10%">Vent Beds</th>
+
+                                    <th class="align-middle" width="10%">Accuracy Remarks</th>
+                                    <th class="align-middle" width="10%">Flag</th>
+                                    <th class="align-middle" width="10%">Demand For Date</th>
+                                    <th class="align-middle" width="10%">OE Demand By</th>
+                                    <th class="align-middle" width="10%">Tot. Estimated Demand</th>
+                                    <th class="align-middle" width="10%">UE Demand By</th>
+
+                                    <th class="align-middle" width="10%">Consumption For Date</th>
+                                    <th class="align-middle" width="10%">Consumption Updated Date</th>
+                                    <th class="align-middle" width="10%">Total O2 Consumed</th>
+                                    <th class="align-middle" width="10%">Total O2 Delivered</th>
+                                    <th class="align-middle" width="10%">Total O2 Generated</th>
+
                                     <th class="align-middle" width="40%">Action</th>
                                 </tr>
                             </thead>
@@ -72,6 +86,20 @@
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_icu_beds : 'NA'}}</td>
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_o2_concentrators : 'NA'}}</td>
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_vent_beds : 'NA'}}</td>
+
+                                        <td>No Date</td>
+                                        <td>No Date</td>
+                                        <td>No Date</td>
+                                        <td>No Date</td>
+                                        <td>No Date</td>
+                                        <td>No Date</td>
+
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->consumption_for_date : 'NA'}}</td>
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->consumption_updated_date : 'NA'}}</td>
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_consumed : 'NA'}}</td>
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_delivered : 'NA'}}</td>
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_generated : 'NA'}}</td>
+
                                         {{-- <td>
                                             <!-- Button trigger modal -->
                                             <button type="button"

@@ -12,3 +12,8 @@
     color: red;
     font-weight: 500;
 }
+
+
+#infrastructure th, #infrastructure tbody td{
+    font-size: 13px !important;
+}
