@@ -22,6 +22,7 @@ class OxygenDataController extends Controller
 {
     public function Oxygen(){
         $allInOxygenStatus  =   HealthFacilityOxygen::all();
+        //dd($allInOxygenStatus[2]->FacilityBedInfo);
         return view('oxygen_status')
             ->with('allInOxygenStatus',$allInOxygenStatus);
     }

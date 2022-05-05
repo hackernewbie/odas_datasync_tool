@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Models\FacilityNodalOfficer;
 use App\Services\GoogleSheetService;
 use App\Models\FacilityInfrastructure;
+use App\Models\ProcessesRun;
 
 class FacilityController extends Controller
 {
@@ -188,6 +189,7 @@ class FacilityController extends Controller
 
                     Log::debug("Facility Information Data Updated in DB. Facility Name: " . $tempFacilityName->id . ' - ' . $facilityName);
                 }
+
                 DB::commit();
             }
             //DB::commit();

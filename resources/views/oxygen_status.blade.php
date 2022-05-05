@@ -30,13 +30,17 @@
                                 <tr>
                                     <th class="align-middle" width="10%">ODAS ID</th>
                                     <th class="align-middle" width="10%">Name</th>
-                                    <th class="align-middle" width="10%">Patients on Oxygen</th>
+                                    <th class="align-middle" width="10%">Tybe B</th>
+                                    <th class="align-middle" width="10%">Type D7</th>
+                                    <th class="align-middle" width="10%">LMO Stock (MT)</th>
+                                    <th class="align-middle" width="10%">LMO Capacity (MT)</th>
+                                    <th class="align-middle" width="10%">PSA Gen Capacity (MT)</th>
+                                    <th class="align-middle" width="10%">PSA Capacity (MT)</th>
+                                    <th class="align-middle" width="10%">Gen Beds</th>
+                                    <th class="align-middle" width="10%">HDU Beds</th>
                                     <th class="align-middle" width="10%">ICU Beds</th>
-                                    <th class="align-middle" width="10%">Total O2 Beds</th>
-                                    {{-- <th class="align-middle" width="10%">Nodal Officer</th>
-                                    <th class="align-middle" width="10%">Ownership Type</th>
-                                    <th class="align-middle" width="10%">Facility Type</th> --}}
-                                    {{-- <th class="align-middle" width="20%">View Details</th> --}}
+                                    <th class="align-middle" width="10%">O2 Concentrators</th>
+                                    <th class="align-middle" width="10%">Vent Beds</th>
                                     <th class="align-middle" width="40%">Action</th>
                                 </tr>
                             </thead>
@@ -46,16 +50,28 @@
                                         <td class="{{$item->odas_facility_id ? 'facility_id_column_green ' : 'facility_id_column_red'}}">{{$item->odas_facility_id ? $item->odas_facility_id : 'Not Updated'}}</td>
                                         <td>{{$item->facility_name}}</td>
                                         <td>
-                                            {{$item->no_of_patients_on_o2}}
+                                            {{$item->total_typeB_cylinders_available}}
                                         </td>
                                         <td>
-                                            {{$item->no_of_ICU_beds}}
+                                            {{$item->total_typeD_cylinders}}
                                         </td>
                                         <td>
-                                            {{$item->no_of_o2_supported_beds}}
-                                            {{-- <span class="badge badge-pill badge-soft-success font-size-11">Paid</span> --}}
+                                            {{$item->lmo_current_stock_in_MT}}
                                         </td>
-
+                                        <td>
+                                            {{$item->lmo_current_storage_capacity_in_MT}}
+                                        </td>
+                                        <td>
+                                            {{$item->psa_gen_capacity_in_MT}}
+                                        </td>
+                                        <td>
+                                            {{$item->psa_storage_capacity_in_MT}}
+                                        </td>
+                                        <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_gen_beds : 'NA'}}</td>
+                                        <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_hdu_beds : 'NA'}}</td>
+                                        <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_icu_beds : 'NA'}}</td>
+                                        <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_o2_concentrators : 'NA'}}</td>
+                                        <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_vent_beds : 'NA'}}</td>
                                         {{-- <td>
                                             <!-- Button trigger modal -->
                                             <button type="button"
