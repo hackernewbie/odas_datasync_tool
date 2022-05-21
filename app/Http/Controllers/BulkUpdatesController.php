@@ -41,6 +41,10 @@ class BulkUpdatesController extends Controller
                     app('App\Http\Controllers\OxygenDataController')->UpdateFacilityO2ConsumptionData($facility->odas_facility_id);
                     /// Update the Log table
                     ProcessesRun::create(['description' => 'Oxygen Consumption Data pushed to ODAS.','status' => 'Success']);
+
+                    app('App\Http\Controllers\OxygenDataController')->UpdateOxygenDemand($facility->odas_facility_id);
+                    /// Update the Log table
+                    ProcessesRun::create(['description' => 'Oxygen Demand Data pushed to ODAS.','status' => 'Success']);
                 }
                 else{
                     //Log::debug('Skipping: ' . $facility->facility_name . '. No facility Id assigned!');

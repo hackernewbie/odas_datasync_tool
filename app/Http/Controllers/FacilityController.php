@@ -197,16 +197,17 @@ class FacilityController extends Controller
             return redirect()->back()->with('success', 'Facility Information Fetched!');
         }
 
-        catch(\Exception $ex){
+        catch(\GuzzleHttp\Exception\ClientException $ex){
             DB::rollback();
-            Log::error($ex->getMessage());
+            Log::error($ex->getResponse()->getBody()->getContents());
             return redirect()->back()->withErrors($ex->getMessage())->withInput();
         }
     }
 
     public function GenerateFacilityId($hospitalName){
-        Log::debug('-------------------------------------------------------');
+        Log::debug('\n -------------------------------------------------------');
         Log::debug("Attempting to generate FacilityId for: " . $hospitalName);
+        $response = null;
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
@@ -268,7 +269,9 @@ class FacilityController extends Controller
                 'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
                 'body'    => json_encode($params)
             ]);
+
             $dataRes =   json_decode($response->getBody(), true);
+
 
             if($dataRes !== null){
                 /// Save the reference_number, facilityId and status in the local DB
@@ -285,8 +288,9 @@ class FacilityController extends Controller
                 return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
-        catch(\Exception $ex){
-            Log::error($ex->getMessage());
+        catch(\GuzzleHttp\Exception\ClientException $ex){
+            //dd($ex->getResponse()->getBody()->getContents());
+            Log::error($ex->getResponse()->getBody()->getContents());
             return redirect()->back()->with('error', $ex->getMessage());
         }
     }
@@ -345,9 +349,10 @@ class FacilityController extends Controller
                 return redirect()->back()->with('success', 'Facility Infrastructure Updated Successfully!');
             }
         }
-        catch(\Exception $ex){
+        catch(\GuzzleHttp\Exception\ClientException $ex){
             //dd($ex->getMessage());
-            Log::error('Exception while pushing Facility Infra bed data- ' .$ex->getMessage());
+            //Log::error('Exception while pushing Facility Infra bed data- ' .$ex->getMessage());
+            Log::error('Exception while pushing Facility Infra bed data- ' . $ex->getResponse()->getBody()->getContents());
             return redirect()->back()->with('error', $ex->getMessage());
         }
     }

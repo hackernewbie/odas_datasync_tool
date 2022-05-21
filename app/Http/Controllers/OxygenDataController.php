@@ -430,6 +430,10 @@ class OxygenDataController extends Controller
         }
     }
 
+    public function UpdateOxygenDemand($odasFacilityId){
+        Log::debug("Attempting to push O2 Demand Data for: " . $odasFacilityId);
+    }
+
     public function UpdateFacilityO2ConsumptionData($odasFacilityId){
         Log::debug("Attempting to push O2 Consumtion Data for: " . $odasFacilityId);
         try{
