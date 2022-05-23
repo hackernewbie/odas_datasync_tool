@@ -565,10 +565,9 @@ class OxygenDataController extends Controller
                 }
             }
             else{
-                Log::debug('No Data for FacilityId: ' . $odasFacilityId. ' Skipping');
+                Log::debug('No Oxygen Demand Data for FacilityId: ' . $odasFacilityId. ' Skipping');
             }
 
-            dd($dataRes);
         }
         catch(\Exception $ex){
             Log::error($ex->getMessage());

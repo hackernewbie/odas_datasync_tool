@@ -29,6 +29,10 @@ class Kernel extends ConsoleKernel
 
         //$schedule->call('App\Http\Controllers\OxygenDataController@FetchOxygenData')->everyMinute();
         $schedule->call('App\Http\Controllers\BulkUpdatesController@BulkUpdateFacilityO2Infra')->everyMinute();
+
+        // $schedule->call('App\Http\Controllers\BulkUpdatesController@BulkUpdateFacilityO2Infra')
+        //                         ->dailyAt('19:46')
+        //                         ->timezone('Asia/Kolkata');
     }
 
     /**
