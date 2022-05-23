@@ -51,6 +51,7 @@ class HealthFacilityOxygen extends Model
                                 'appx_o2_demand_with_current_load_in_hrs',
                                 'appx_o2_demand_with_current_no_of_patients_in_cum',
                                 'appx_o2_demand_with_all_beds_full',
+                                'demand_estimation',
                                 'requestId'
                             ];
 
@@ -68,7 +69,7 @@ class HealthFacilityOxygen extends Model
         return $this->hasOne('App\Models\FacilityOxygenConsumption','oxygen_data_id');
     }
 
-    public function FacilityOxygenDemandTable(){
-        return $this->hasOne('App\Models\FacilityOxygenDemandTable','oxygen_data_id');
+    public function FacilityOxygenDemand(){
+        return $this->hasOne('App\Models\FacilityOxygenDemand','oxygen_data_id');
     }
 }

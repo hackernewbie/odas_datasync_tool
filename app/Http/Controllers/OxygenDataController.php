@@ -17,6 +17,8 @@ use App\Services\GoogleSheetService;
 use App\Models\oxygenConsumptionInfo;
 use App\Models\HealthFacilityAnalysis;
 use App\Models\FacilityOxygenConsumption;
+use App\Models\FacilityOxygenDemand;
+use PhpParser\Parser\Multiple;
 
 class OxygenDataController extends Controller
 {
@@ -43,10 +45,15 @@ class OxygenDataController extends Controller
             $occupancyDate          =   $allOxygenData[0][2];
             $yesterdayDate          =   Carbon::parse($occupancyDate)->addDays(-1)->format("Y-m-d");
 
+            $demandForDate          =   $allOxygenData[0][2];
+            $demandRaisedDate       =   Carbon::parse($occupancyDate)->addDays(1)->format("Y-m-d");
+
             $typeBCylinderCapacity  =   1.5;            ///CuM
             $typeDCylinderCapacity  =   7;              ///CuM
 
             for($count = 2; $count <= count($allOxygenData)-1; $count++){
+                Log::debug('Fetching data for - ' .$allOxygenData[$count][2]);
+
                 $generatedUUID              = Str::uuid();
 
                 $oxygenDataForHosp          = HealthFacilityOxygen::where('facility_name',$allOxygenData[$count][2])->first();
@@ -117,6 +124,9 @@ class OxygenDataController extends Controller
                     $noOfVentBedsForDB                                                  =   isset($allOxygenData[$count][52]) == false ?  0 : $allOxygenData[$count][52];
                     $requestIdForDB                                                     =   $generatedUUID;
 
+
+                    /// Oxygen Demand Estimation
+                    $demandEstimationForDB                     =    isset($allOxygenData[$count][53]) == false ?  0 : $allOxygenData[$count][53];
 
                     /// Analysis Data
                     // $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
@@ -191,9 +201,40 @@ class OxygenDataController extends Controller
                         'appx_o2_demand_with_current_no_of_patients_in_cum' =>  $appxDemandWithCurrNoOfPatientsInCumForDB ? $appxDemandWithCurrNoOfPatientsInCumForDB : 0,
                         'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullInHrsForDB ? $appDemandWithAllBedsFullInHrsForDB : 0,
 
+                        'demand_estimation'                                 =>  $demandEstimationForDB,
+
                         'requestId'                                         =>  $generatedUUID,
                     ];
+
+                    /// Demand Estimation calculation
+                    $tempDemandAccuracyFlagForDB        =   '';
+                    $overEstimatedByForDB               =   null;
+                    $totalEstimatedDemandForDB          =   '0';
+                    $underEstimatedByForDB              =   null;
+
+                    if(isset($allOxygenData[$count][49]) && $allOxygenData[$count][49] != null){
+                        $totalEstimatedDemandForDB          = ConvertLPMToMT(($noOfGenBedsForDB * 7.4) + ($noOfHDUBedsForDB * 10) + ($noOfICUBedsForDB * 10) + ($noOfVentBedsForDB * 48));
+
+                        if($demandEstimationForDB < 0){
+                            /// Over-estimated
+                            $tempDemandAccuracyFlagForDB    = 'Over';
+                            if(str_contains($demandEstimationForDB, '-')){
+                                $overEstimatedByForDB   = ltrim($demandEstimationForDB, $demandEstimationForDB[0]);
+                            }
+                        }
+                        elseif($demandEstimationForDB == 0){
+                            /// Accurate
+                            $tempDemandAccuracyFlagForDB    = 'Accurate';
+                        }
+                        else{
+                            /// Under-estimated
+                            $tempDemandAccuracyFlagForDB    = 'Under';
+                            $underEstimatedByForDB          = $demandEstimationForDB;
+                        }
+                    }
+                    //dd($tempDemandAccuracyFlagForDB . ' : ' . 'Over-> ' . $overEstimatedByForDB . ' : Under-> ' . $underEstimatedByForDB . ' : Total-> ' . $totalEstimatedDemandForDB);
                     //Log::debug($oxygenParamsForDB);
+
                     if($oxygenDataForHosp == null && $facilityInfoIdToInsert !==null){         /// Add new into oxygen_data
                         $createdOxygenData              =   HealthFacilityOxygen::create($oxygenParamsForDB);
 
@@ -208,6 +249,25 @@ class OxygenDataController extends Controller
                             'occupancy_date'                                =>  $occupancyDate,
                             'requestId'                                     =>  $requestIdForDB,
                         ]);
+                        Log::debug('Created Facility Bed Info data ' . $createdFacilityBedInfo->id);
+                        if(isset($allOxygenData[$count][49]) && $allOxygenData[$count][49] != null){
+                            /// Add Facility Oxygen Demand Here
+                            $createdFacilityOxygenDemand        =   FacilityOxygenDemand::create([
+                                'oxygen_data_id'                        => $createdOxygenData->id,
+                                'odas_facility_id'                      => $odasFacilityIdToInsert,
+                                'accuracy_remarks'                      => '',
+                                'demand_accuracy_flag'                  => $tempDemandAccuracyFlagForDB,
+                                'demand_for_date'                       => $demandForDate,
+                                'demand_raised_date'                    => $demandRaisedDate,
+                                'over_estimated_by'                     => $overEstimatedByForDB,
+                                'total_estimated_demand'                => $totalEstimatedDemandForDB,
+                                'under_estimated_by'                    => $underEstimatedByForDB,
+                                'requestId'                             => $generatedUUID
+                            ]);
+
+                            Log::debug('Created Oxygen demand data ' . $createdFacilityOxygenDemand->id);
+                        }
+
 
                         $createdFacilityOxygenConsumption   =   FacilityOxygenConsumption::create([
                             'oxygen_data_id'                    =>  $createdOxygenData->id,
@@ -219,6 +279,7 @@ class OxygenDataController extends Controller
                             'odas_facility_id'                  =>  $odasFacilityIdToInsert,
                             'requestId'                         =>  $generatedUUID
                         ]);
+                        Log::debug('Created Oxygen consumption data ' . $createdFacilityOxygenConsumption->id);
 
                         //dd($createdOxygenData->id);
                         /// Health Facility Analysis Table
@@ -239,14 +300,12 @@ class OxygenDataController extends Controller
                     }
                     elseif($oxygenDataForHosp !== null) {
                         /// Update
-
                         Log::debug('Processing for update: ' . $oxygenDataForHosp);
                         $OxygenDataForHospToUpdate                  =   $oxygenDataForHosp;
                         $OxygenDataForHospToUpdate->update($oxygenParamsForDB);
 
                         Log::debug('Oxygen data updated successfully!');
 
-                        //dd($OxygenDataForHospToUpdate->FacilityBedInfo->id);
                         $facilityBedInfoUpdating             = FacilityBedInfo::find($OxygenDataForHospToUpdate->FacilityBedInfo->id)->update([
                             'odas_facility_id'                              =>  $odasFacilityIdToInsert,
                             'no_gen_beds'                                   =>  $noOfGenBedsForDB ? $noOfGenBedsForDB : 0,
@@ -257,8 +316,23 @@ class OxygenDataController extends Controller
                             'occupancy_date'                                =>  $occupancyDate,
                             'requestId'                                     =>  $requestIdForDB,
                         ]);
+
                         Log::debug('Facility Bed Info Updated: ' . $OxygenDataForHospToUpdate->FacilityBedInfo->id);
-                        //dd($OxygenDataForHospToUpdate);
+                        ///dd($OxygenDataForHospToUpdate->FacilityOxygenDemand);
+                        if(FacilityOxygenDemand::find($OxygenDataForHospToUpdate->FacilityOxygenDemand) !== null){
+                            /// Update Facility Oxygen Demand Here
+                            $facilityOxygenDemandUpdating        =   FacilityOxygenDemand::find($OxygenDataForHospToUpdate->FacilityOxygenDemand->id)->update([
+                                'accuracy_remarks'                      => '',
+                                'demand_accuracy_flag'                  => $tempDemandAccuracyFlagForDB,
+                                'demand_for_date'                       => $demandForDate,
+                                'demand_raised_date'                    => $demandRaisedDate,
+                                'over_estimated_by'                     => $overEstimatedByForDB,
+                                'total_estimated_demand'                => $totalEstimatedDemandForDB,
+                                'under_estimated_by'                    => $underEstimatedByForDB,
+                                'requestId'                             => $generatedUUID
+                            ]);
+                            Log::debug('Facility Oxygen Demand Info Updated: ' . $OxygenDataForHospToUpdate->FacilityOxygenDemand->id);
+                        }
 
                         $facilityOxygenConsumptionUpdating   =   FacilityOxygenConsumption::find($OxygenDataForHospToUpdate->FacilityOxygenConsumption->id)->update([
                             'consumption_for_date'              =>  $yesterdayDate,
@@ -270,7 +344,6 @@ class OxygenDataController extends Controller
                             'requestId'                         =>  $generatedUUID
                         ]);
                         Log::debug('Facility Oxygen Consumption Info Updated: ' . $OxygenDataForHospToUpdate->FacilityOxygenConsumption->id);
-
                     }
                     DB::commit();
                 }
@@ -286,12 +359,18 @@ class OxygenDataController extends Controller
             // if($ex->getMessage() == 'A non-numeric value encountered'){
             //     dd($allOxygenData[$count]);
             // }
+            ///dd($ex->getMessage());
             DB::rollback();
             return redirect()->back()->withErrors($ex->getMessage())->withInput();
         }
         //Insert into DB if data not already present else update data
 
     }
+
+
+    /// ******************************************************************************************* ///
+    /// ******************************** API Functions ******************************************** ///
+    /// ******************************************************************************************* ///
 
     public function UpdateOxygenDataByHospital($hospitalName){
         Log::debug("Attempting to push Oxygen Data To ODAS for: " . $hospitalName);
@@ -432,6 +511,69 @@ class OxygenDataController extends Controller
 
     public function UpdateOxygenDemand($odasFacilityId){
         Log::debug("Attempting to push O2 Demand Data for: " . $odasFacilityId);
+        try{
+            $odasApiBAseURL                                 =   config('odas.odas_base_url');
+            $updateO2DemandEndpointURI                      =   'v1.0/odas/update-facility-oxygen-demand';
+            $facilityOxygenBeingProcessed                   =   FacilityOxygenDemand::where('odas_facility_id',$odasFacilityId)->latest()->first();
+
+            if($facilityOxygenBeingProcessed != null){
+                $newToken                                       =   getODASAccessToken();
+
+                // Save the authToken to the DB
+                $odasToken                =   new ODASToken();
+                $odasToken->token         =   $newToken;
+                $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+                $odasToken->save();
+                //dd('success');
+                Log::debug("API Auth Token Generated!");
+
+                /// Update Facility O2 Infra API
+                $odasTokenToUse                     =     $odasToken->token;
+                $params = array(
+                    "demandInfo" => [
+                        "accuracy_remarks"              => $facilityOxygenBeingProcessed->accuracy_remarks,
+                        "demand_accuracy_flag"          => $facilityOxygenBeingProcessed->demand_accuracy_flag,
+                        "demand_for_date"               => $facilityOxygenBeingProcessed->demand_for_date,
+                        "demand_raised_date"            => $facilityOxygenBeingProcessed->demand_raised_date,
+                        "over_estimated_by"             => $facilityOxygenBeingProcessed->over_estimated_by,
+                        "total_estimated_demand"        => $facilityOxygenBeingProcessed->total_estimated_demand,
+                        "under_estimated_by"            => $facilityOxygenBeingProcessed->under_estimated_by,
+                    ],
+                    "facilityid"                    => $facilityOxygenBeingProcessed->odas_facility_id,
+                    "requestId"                     => $facilityOxygenBeingProcessed->requestId,
+                    "timestamp"                     => $odasToken->timestamp_utc
+                );
+
+                $client = new Client();
+                Log::debug("Attempting to push O2 Demand data to API: " . $odasApiBAseURL.$updateO2DemandEndpointURI);
+                $response = $client->post($odasApiBAseURL.$updateO2DemandEndpointURI, [
+                    'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                    'body'    => json_encode($params)
+                ]);
+                $dataRes =   json_decode($response->getBody(), true);
+
+                if($dataRes !== null){
+                    $oxygenDemandInfo                           =   FacilityOxygenDemand::find($facilityOxygenBeingProcessed->id);
+                    $oxygenDemandInfo->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                    $oxygenDemandInfo->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                    $oxygenDemandInfo->save();
+
+                    Log::debug('----------------------------------------');
+                    Log::debug('Oxygen Demand Data Updated Successfully!' . ' - ' .$dataRes['referencenumber']);
+                    /// Update Demand Data
+                    return redirect()->back()->with('success', 'Oxygen Demand Data Updated Successfully!');
+                }
+            }
+            else{
+                Log::debug('No Data for FacilityId: ' . $odasFacilityId. ' Skipping');
+            }
+
+            dd($dataRes);
+        }
+        catch(\Exception $ex){
+            Log::error($ex->getMessage());
+            return redirect()->back()->with('error', $ex->getMessage());
+        }
     }
 
     public function UpdateFacilityO2ConsumptionData($odasFacilityId){

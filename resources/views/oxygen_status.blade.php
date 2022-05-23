@@ -122,7 +122,7 @@
                                             @endif
 
                                             @if ($item->odas_facility_id !== null)
-                                                <a href="#" class="btn btn-sm btn-info">
+                                                <a href="{{route('update.oxygen.demand',$item->odas_facility_id)}}" class="btn btn-sm btn-info">
                                                     Push O2 Demand
                                                 </a>
                                             @endif

@@ -16,6 +16,7 @@ class CreateFacilityOxygenDemandTable extends Migration
         Schema::create('facility_oxygen_demand', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('oxygen_data_id')->unsigned()->index()->nullable();
+            $table->foreign('oxygen_data_id')->references('id')->on('oxygen_data')->onDelete('cascade');
             $table->string('accuracy_remarks')->nullable();
             $table->string('demand_accuracy_flag');
             $table->string('demand_for_date');                          /// yyyy-mm--dd

@@ -13,6 +13,13 @@ function ConvertCuMToMT($value_in_cum){
     return $valueInMT;
 }
 
+function ConvertLPMToMT($value_in_LPM){
+    $valueInCUM     =   ($value_in_LPM/1000)*60*24;
+    $valueInMT      =   $valueInCUM*1.4291/1000;
+
+    return $valueInMT;
+}
+
 function getODASAccessToken(){
     $clientId       =   config('odas.odas_client_id');
     $clientSecret   =   config('odas.odas_client_secret');
