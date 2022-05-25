@@ -127,6 +127,7 @@ class OxygenDataController extends Controller
 
                     /// Oxygen Demand Estimation
                     $demandEstimationForDB                     =    isset($allOxygenData[$count][53]) == false ?  0 : $allOxygenData[$count][53];
+                    $demandEstimationRemarksForDB              =    isset($allOxygenData[$count][54]) == false ?  'No Remarks' : $allOxygenData[$count][54];
 
                     /// Analysis Data
                     // $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];
@@ -202,6 +203,7 @@ class OxygenDataController extends Controller
                         'appx_o2_demand_with_all_beds_full'                 =>  $appDemandWithAllBedsFullInHrsForDB ? $appDemandWithAllBedsFullInHrsForDB : 0,
 
                         'demand_estimation'                                 =>  $demandEstimationForDB,
+                        'accuracy_remarks'                                  =>  $demandEstimationRemarksForDB,
 
                         'requestId'                                         =>  $generatedUUID,
                     ];
@@ -255,7 +257,7 @@ class OxygenDataController extends Controller
                             $createdFacilityOxygenDemand        =   FacilityOxygenDemand::create([
                                 'oxygen_data_id'                        => $createdOxygenData->id,
                                 'odas_facility_id'                      => $odasFacilityIdToInsert,
-                                'accuracy_remarks'                      => '',
+                                'accuracy_remarks'                      => $demandEstimationRemarksForDB,
                                 'demand_accuracy_flag'                  => $tempDemandAccuracyFlagForDB,
                                 'demand_for_date'                       => $demandForDate,
                                 'demand_raised_date'                    => $demandRaisedDate,
@@ -322,7 +324,7 @@ class OxygenDataController extends Controller
                         if(FacilityOxygenDemand::find($OxygenDataForHospToUpdate->FacilityOxygenDemand) !== null){
                             /// Update Facility Oxygen Demand Here
                             $facilityOxygenDemandUpdating        =   FacilityOxygenDemand::find($OxygenDataForHospToUpdate->FacilityOxygenDemand->id)->update([
-                                'accuracy_remarks'                      => '',
+                                'accuracy_remarks'                      => $demandEstimationRemarksForDB,
                                 'demand_accuracy_flag'                  => $tempDemandAccuracyFlagForDB,
                                 'demand_for_date'                       => $demandForDate,
                                 'demand_raised_date'                    => $demandRaisedDate,
