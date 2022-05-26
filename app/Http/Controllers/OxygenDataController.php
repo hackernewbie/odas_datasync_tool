@@ -66,68 +66,147 @@ class OxygenDataController extends Controller
                                                 ? $listOfFacilities->where('facility_name',$allOxygenData[$count][2])->first()->id
                                                 : null;
 
-                //dd($facilityInfoIdToInsert);
-                /// dump($allOxygenData[$count][2] . " --> " . $odasFacilityIdToInsert);
+                //dd($allOxygenData[$count][5]);
+                /// dump($allOxygenData[$count][2][$count][2] . " --> " . $odasFacilityIdToInsert);
                 if($odasFacilityIdToInsert !== null && $facilityInfoIdToInsert !==null && isset($allOxygenData[$count][4])){
                     $facilityNameForDB                          =   isset($allOxygenData[$count][2]) == false ?  'Empty' : $allOxygenData[$count][2];
+                    $facilityNameForDB                          =   $facilityNameForDB != "" ? $facilityNameForDB : 0;
+
                     $supplySourceForDB                          =   isset($allOxygenData[$count][3]) == false ?  'Empty' : $allOxygenData[$count][3];
+                    $supplySourceForDB                          =   $supplySourceForDB != "" ? $supplySourceForDB : 0;
+
                     $timeOfUpdateForDB                          =   isset($allOxygenData[$count][4]) == false ?  'Empty' : $allOxygenData[$count][4];
+                    $timeOfUpdateForDB                          =   $timeOfUpdateForDB != "" ? $timeOfUpdateForDB : 0;
+
                     $noOfPatientsOnO2                           =   isset($allOxygenData[$count][5]) == false ?  'Empty' : $allOxygenData[$count][5];
+                    $noOfPatientsOnO2                           =   $noOfPatientsOnO2 != "" ? $noOfPatientsOnO2 : 0;
+
                     $o2SupportedBedsForDB                       =   isset($allOxygenData[$count][6]) == false ?  'Empty' : $allOxygenData[$count][6];
+                    $o2SupportedBedsForDB                       =   $o2SupportedBedsForDB != "" ? $o2SupportedBedsForDB : 0;
+
                     $icuBedsForDB                               =   isset($allOxygenData[$count][7]) == false ?  'Empty' : $allOxygenData[$count][7];
+                    $icuBedsForDB                               =   $icuBedsForDB != "" ? $icuBedsForDB : 0;
+
                     $noOfOxygenatedBedsIncludingICUForDB        =   isset($allOxygenData[$count][8]) == false ?  'Empty' : $allOxygenData[$count][8];
+                    $noOfOxygenatedBedsIncludingICUForDB        =   $noOfOxygenatedBedsIncludingICUForDB != "" ? $noOfOxygenatedBedsIncludingICUForDB : 0;
+
                     $psaInLmuForDB                              =   isset($allOxygenData[$count][9]) == false ?  'Empty' : $allOxygenData[$count][9];
+                    $psaInLmuForDB                              =   $psaInLmuForDB != "" ? $psaInLmuForDB : 0;
+
                     //$isActiveForDB                              =   isset($allOxygenData[$count][10]) == false ?  'Empty' : $allOxygenData[$count][10];
                     $isActiveForDB                              =   isset($allOxygenData[$count][10]) == false ?  'FALSE' : 'TRUE';
+                    $isActiveForDB                              =   $isActiveForDB != "" ? $isActiveForDB : 'FALSE';
+
                     $plannedPSACapacityInCumForDB               =   isset($allOxygenData[$count][11]) == false ?  'Empty' : $allOxygenData[$count][11];
+                    $plannedPSACapacityInCumForDB               =   $plannedPSACapacityInCumForDB != "" ? $plannedPSACapacityInCumForDB : 0;
+
                     $psaCapacityInCumForDB                      =   isset($allOxygenData[$count][12]) == false ?  'Empty' : $allOxygenData[$count][12];
+                    $psaCapacityInCumForDB                      =   $psaCapacityInCumForDB != "" ? $psaCapacityInCumForDB : 0;
+
                     $psaGenerationCapacityInMT                  =   ConvertCuMToMT($psaCapacityInCumForDB);
                     $psaStorageCapacityInMT                     =   ConvertCuMToMT($psaCapacityInCumForDB);
+
                     $cryogenicPlantInLtrForDB                   =   isset($allOxygenData[$count][13]) == false ?  'Empty' : $allOxygenData[$count][13];
+                    $cryogenicPlantInLtrForDB                   =   $cryogenicPlantInLtrForDB != "" ? $cryogenicPlantInLtrForDB : 0;
+
                     $lmoCurrentStorageCapacityInMT              =   ConvertCuMToMT($cryogenicPlantInLtrForDB);
+
                     $plannedCryoCapacityInCumForDB              =   isset($allOxygenData[$count][14]) == false ?  'Empty' : $allOxygenData[$count][14];
+                    $plannedCryoCapacityInCumForDB              =   $plannedCryoCapacityInCumForDB != "" ? $plannedCryoCapacityInCumForDB : 0;
+
                     $cryogenicPlantCapacityInCumForDB           =   isset($allOxygenData[$count][15]) == false ?  'Empty' : $allOxygenData[$count][15];
+                    $cryogenicPlantCapacityInCumForDB           =   $cryogenicPlantCapacityInCumForDB !="" ? $cryogenicPlantCapacityInCumForDB : 0;
+
                     $lmoCurrentStockInMT                        =   ConvertCuMToMT($cryogenicPlantCapacityInCumForDB);
                     $lmoStorageCapacityStockInMT                =   ConvertCuMToMT($cryogenicPlantCapacityInCumForDB);
 
                     $noOfEmptyTypeBCylindersForDB               =   isset($allOxygenData[$count][16]) == false ?  0 : $allOxygenData[$count][16];
-                    $noOfTypeBCylindersInTransitForDB           =   isset($allOxygenData[$count][17]) == false ?  0 : $allOxygenData[$count][17];
-                    $noOfFilledTypeBCylindersForDB              =   isset($allOxygenData[$count][18]) == false ?  0 : $allOxygenData[$count][18];
-                    $totalTypeBCylindersAvailableForDB          =   isset($allOxygenData[$count][19]) == false ?  0 : $allOxygenData[$count][19];
-                    $typeBConsumedIn24HoursForDB                =   isset($allOxygenData[$count][20]) == false ?  0 : $allOxygenData[$count][20];
+                    $noOfEmptyTypeBCylindersForDB               =   $noOfEmptyTypeBCylindersForDB != "" ? $noOfEmptyTypeBCylindersForDB : 0;
 
+                    $noOfTypeBCylindersInTransitForDB           =   isset($allOxygenData[$count][17]) == false ?  0 : $allOxygenData[$count][17];
+                    $noOfTypeBCylindersInTransitForDB           =   $noOfTypeBCylindersInTransitForDB !="" ? $noOfTypeBCylindersInTransitForDB : 0;
+
+                    $noOfFilledTypeBCylindersForDB              =   isset($allOxygenData[$count][18]) == false ?  0 : $allOxygenData[$count][18];
+                    $noOfFilledTypeBCylindersForDB              =   $noOfFilledTypeBCylindersForDB !="" ? $noOfFilledTypeBCylindersForDB : 0;
+
+                    $totalTypeBCylindersAvailableForDB          =   isset($allOxygenData[$count][19]) == false ?  0 : $allOxygenData[$count][19];
+                    $totalTypeBCylindersAvailableForDB          =   $totalTypeBCylindersAvailableForDB != "" ? $totalTypeBCylindersAvailableForDB : 0;
+
+                    $typeBConsumedIn24HoursForDB                =   isset($allOxygenData[$count][20]) == false ?  0 : $allOxygenData[$count][20];
+                    $typeBConsumedIn24HoursForDB                =   $typeBConsumedIn24HoursForDB !="" ? $typeBConsumedIn24HoursForDB : 0;
+
+                    //dd($typeBConsumedIn24HoursForDB);
                     $noOfEmptyTypeDCylindersForDB               =   isset($allOxygenData[$count][21]) == false ?  0 : $allOxygenData[$count][21];
+                    $noOfEmptyTypeDCylindersForDB               =   $noOfEmptyTypeDCylindersForDB !="" ? $noOfEmptyTypeDCylindersForDB : 0;
+
                     $noOfTypeDCylindersInTransitForDB           =   isset($allOxygenData[$count][22]) == false ?  0 : $allOxygenData[$count][22];
+                    $noOfTypeDCylindersInTransitForDB           =   $noOfTypeDCylindersInTransitForDB != "" ? $noOfTypeDCylindersInTransitForDB : 0;
+
                     $noOfFilledTypeDCylindersForDB              =   isset($allOxygenData[$count][23]) == false ?  0 : $allOxygenData[$count][23];
+                    $noOfFilledTypeDCylindersForDB              =   $noOfFilledTypeDCylindersForDB != "" ? $noOfFilledTypeDCylindersForDB : 0;
+
                     $totalTypeDCylindersAvailableForDB          =   isset($allOxygenData[$count][24]) == false ?  0 : $allOxygenData[$count][24];
+                    $totalTypeDCylindersAvailableForDB          =   $totalTypeDCylindersAvailableForDB != "" ? $totalTypeDCylindersAvailableForDB : 0;
+
                     $typeDConsumedIn24HoursForDB                =   isset($allOxygenData[$count][25]) == false ?  0 : $allOxygenData[$count][25];
+                    $typeDConsumedIn24HoursForDB                =   $typeDConsumedIn24HoursForDB !="" ? $typeDConsumedIn24HoursForDB : 0;
 
                     $o2TypeDAndTypeBCapacityInCumForDB          =   isset($allOxygenData[$count][26]) == false ?  0 : $allOxygenData[$count][26];
+                    $o2TypeDAndTypeBCapacityInCumForDB          =   $o2TypeDAndTypeBCapacityInCumForDB != "" ? $o2TypeDAndTypeBCapacityInCumForDB : 0;
+
                     $overallO2AvailabilityInCumForDB            =   isset($allOxygenData[$count][27]) == false ?  0 : $allOxygenData[$count][27];
+                    $overallO2AvailabilityInCumForDB            =   $overallO2AvailabilityInCumForDB != "" ? $overallO2AvailabilityInCumForDB : 0;
+
                     $actualO2AvailabilityInCumForDB             =   isset($allOxygenData[$count][28]) == false ?  0 : $allOxygenData[$count][28];
+                    $actualO2AvailabilityInCumForDB             =   $actualO2AvailabilityInCumForDB !="" ? $actualO2AvailabilityInCumForDB : 0;
+
                     $noOfBipapMachinesForDB                     =   isset($allOxygenData[$count][30]) == false ?  0 : $allOxygenData[$count][30];
+                    $noOfBipapMachinesForDB                     =   $noOfBipapMachinesForDB != "" ? $noOfBipapMachinesForDB : 0;
+
                     $noOfO2ConcentratorsForDB                   =   isset($allOxygenData[$count][31]) == false ?  0 : $allOxygenData[$count][31];
+                    $noOfO2ConcentratorsForDB                   =   $noOfO2ConcentratorsForDB != "" ? $noOfO2ConcentratorsForDB : 0;
                     //dump($noOfO2ConcentratorsForDB);
                     $unaccountedTypeBForDb                      =   isset($allOxygenData[$count][32]) == false ?  0 : $allOxygenData[$count][32];
+                    $unaccountedTypeBForDb                      =   $unaccountedTypeBForDb != "" ? $unaccountedTypeBForDb : 0;
+
                     $unaccountedTypeDForDb                      =   isset($allOxygenData[$count][33]) == false ?  0 : $allOxygenData[$count][33];
+                    $unaccountedTypeDForDb                      =   $unaccountedTypeDForDb != "" ? $unaccountedTypeDForDb : 0;
 
                     $appxDemandWithCurrLoadInHrsForDB           =   isset($allOxygenData[$count][34]) == false ?  0 : $allOxygenData[$count][34];
+                    $appxDemandWithCurrLoadInHrsForDB           =   $appxDemandWithCurrLoadInHrsForDB != "" ? $appxDemandWithCurrLoadInHrsForDB : 0;
+
                     $appxDemandWithCurrNoOfPatientsInCumForDB   =   isset($allOxygenData[$count][35]) == false ?  0 : $allOxygenData[$count][35];
+                    $appxDemandWithCurrNoOfPatientsInCumForDB   =   $appxDemandWithCurrNoOfPatientsInCumForDB != "" ? $appxDemandWithCurrNoOfPatientsInCumForDB : 0;
+
                     $appDemandWithAllBedsFullInHrsForDB         =   isset($allOxygenData[$count][36]) == false ?  0 : $allOxygenData[$count][36];
+                    $appDemandWithAllBedsFullInHrsForDB         =   $appDemandWithAllBedsFullInHrsForDB !="" ? $appDemandWithAllBedsFullInHrsForDB : 0;
+
                     $appDemandWithAllBedsFullInCumForDB         =   isset($allOxygenData[$count][37]) == false ?  0 : $allOxygenData[$count][37];
+                    $appDemandWithAllBedsFullInCumForDB         =   $appDemandWithAllBedsFullInCumForDB != "" ? $appDemandWithAllBedsFullInCumForDB : 0;
 
                     /// Facility Bed Occupancy Info
-                    $noOfGenBedsForDB                                                   =   isset($allOxygenData[$count][49]) == false ?  0 : $allOxygenData[$count][49];
-                    $noOfHDUBedsForDB                                                   =   isset($allOxygenData[$count][50]) == false ?  0: $allOxygenData[$count][50];
-                    $noOfICUBedsForDB                                                   =   isset($allOxygenData[$count][51]) == false ?  0 : $allOxygenData[$count][51];
-                    $noOfO2ConcentratorsBedInfoForDB                                    =   $noOfO2ConcentratorsForDB;
-                    $noOfVentBedsForDB                                                  =   isset($allOxygenData[$count][52]) == false ?  0 : $allOxygenData[$count][52];
-                    $requestIdForDB                                                     =   $generatedUUID;
+                    $noOfGenBedsForDB                           =   isset($allOxygenData[$count][49]) == false ?  0 : $allOxygenData[$count][49];
+                    $noOfGenBedsForDB                           =   $noOfGenBedsForDB != "" ? $noOfGenBedsForDB : 0;
+
+                    $noOfHDUBedsForDB                           =   isset($allOxygenData[$count][50]) == false ?  0: $allOxygenData[$count][50];
+                    $noOfHDUBedsForDB                           =   $noOfHDUBedsForDB !="" ? $noOfHDUBedsForDB : 0;
+
+                    $noOfICUBedsForDB                           =   isset($allOxygenData[$count][51]) == false ?  0 : $allOxygenData[$count][51];
+                    $noOfICUBedsForDB                           =   $noOfICUBedsForDB !="" ? $noOfICUBedsForDB : 0;
+
+                    $noOfO2ConcentratorsBedInfoForDB            =   $noOfO2ConcentratorsForDB;
+                    $noOfVentBedsForDB                          =   isset($allOxygenData[$count][52]) == false ?  0 : $allOxygenData[$count][52];
+                    $noOfVentBedsForDB                          =   $noOfVentBedsForDB != "" ? $noOfVentBedsForDB : 0;
+
+                    $requestIdForDB                             =   $generatedUUID;
 
 
                     /// Oxygen Demand Estimation
                     $demandEstimationForDB                     =    isset($allOxygenData[$count][53]) == false ?  0 : $allOxygenData[$count][53];
+                    $demandEstimationForDB                     =    $demandEstimationForDB !="" ? $demandEstimationForDB : 0;
+
                     $demandEstimationRemarksForDB              =    isset($allOxygenData[$count][54]) == false ?  'No Remarks' : $allOxygenData[$count][54];
+                    $demandEstimationRemarksForDB              =    $demandEstimationRemarksForDB !="" ? $demandEstimationRemarksForDB : 0;
 
                     /// Analysis Data
                     // $demandForDB                                                        =   isset($allOxygenData[$count][38]) == false ?  'Empty' : $allOxygenData[$count][38];

@@ -9,11 +9,17 @@ function SanitizeString($inputString){
 }
 
 function ConvertCuMToMT($value_in_cum){
+    if($value_in_cum == ""){
+        $value_in_cum   =   0;
+    }
     $valueInMT  =   $value_in_cum*1.4291/1000;
     return $valueInMT;
 }
 
 function ConvertLPMToMT($value_in_LPM){
+    if($value_in_LPM == ""){
+        $value_in_LPM   =   0;
+    }
     $valueInCUM     =   ($value_in_LPM/1000)*60*24;
     $valueInMT      =   $valueInCUM*1.4291/1000;
 

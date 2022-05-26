@@ -26,7 +26,7 @@
                                 <div class="bg-overlay"></div>
                                 <div class="d-flex h-100 flex-column">
 
-                                    <div class="p-4 mt-auto">
+                                    {{-- <div class="p-4 mt-auto">
                                         <div class="row justify-content-center">
                                             <div class="col-lg-7">
                                                 <div class="text-center">
@@ -74,7 +74,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
                                                     <label for="username" class="form-label">Email</label>
                                                     <input name="email" type="email"
                                                         class="form-control @error('email') is-invalid @enderror"
-                                                        value="{{ old('email', 'admin@themesbrand.com') }}" id="username"
+                                                         id="username"
                                                         placeholder="Enter Email" autocomplete="email" autofocus>
                                                     @error('email')
                                                         <span class="invalid-feedback" role="alert">

@@ -2,6 +2,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/creds.json
+/storage/rajiv-creds.json
 /vendor
 .env
 .env.backup

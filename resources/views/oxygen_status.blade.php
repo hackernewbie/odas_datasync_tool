@@ -87,12 +87,13 @@
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_o2_concentrators : 'NA'}}</td>
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_vent_beds : 'NA'}}</td>
 
-                                        <td>No Date</td>
-                                        <td>No Date</td>
-                                        <td>No Date</td>
-                                        <td>No Date</td>
-                                        <td>No Date</td>
-                                        <td>No Date</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->accuracy_remarks : 'No Remarks'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->demand_accuracy_flag : 'No Flag Data'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->demand_for_date : '-'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->demand_raised_date : '-'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->over_estimated_by : '-'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->total_estimated_demand : '-'}}</td>
+                                        <td>{{$item->FacilityOxygenDemand ? $item->FacilityOxygenDemand->under_estimated_by : '-'}}</td>
 
                                         <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->consumption_for_date : 'NA'}}</td>
                                         <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->consumption_updated_date : 'NA'}}</td>
