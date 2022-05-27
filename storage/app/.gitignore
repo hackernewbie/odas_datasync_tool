@@ -1,3 +1,5 @@
 *
 !public/
 !.gitignore
+creds.json
+rajiv-creds.json

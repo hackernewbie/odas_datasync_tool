@@ -17,12 +17,18 @@ class BulkUpdatesController extends Controller
             $allFacilityNames   =   Facility::all();
             //dd($allFacilityNames);
             app('App\Http\Controllers\FacilityController')->GetFacilities();
+
             /// Update the Log table
             ProcessesRun::create(['description' => 'Facility Information Updated.','status' => 'Success']);
 
             foreach($allFacilityNames as $facility){
                 Log::debug('Running Facility Information Fetch To Local DB!');
                 Log::debug('+++++++++++++++++++++++++++++++++++++++++++++++++');
+
+                Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
+
+                app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
+
 
                 Log::debug('Running Bulk Data Push for: ' . $facility->facility_name . ' - ' . $facility->odas_facility_id);
                 if($facility->odas_facility_id != null){
