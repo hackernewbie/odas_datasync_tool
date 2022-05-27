@@ -296,6 +296,7 @@ class FacilityController extends Controller
     }
 
     public function UpdateFacilityInfrastructure($facilityName){
+        Log::debug('Processing ' . $facilityName);
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityBedInfoEndpointURI   =   'v1.0/odas/update-facility-bed-info';
@@ -311,7 +312,6 @@ class FacilityController extends Controller
             $odasToken->timestamp_utc =   Carbon::now()->toJSON();
             $odasToken->save();
             //dd($facilityInfra);
-
             /// Update Facility Bed Info
             $odasTokenToUse           =     $odasToken->token;
             $params = array(
@@ -325,8 +325,9 @@ class FacilityController extends Controller
                 "facilityid"    => $facilityToUpdate->odas_facility_id,
                 "requestId"     => $facilityInfra->requestId,
                 "timestamp"     => $odasToken->timestamp_utc
-             );
+            );
 
+            log::debug('Data to API: ' . $params);
             //dd($params);
 
             $client = new Client();
@@ -345,7 +346,7 @@ class FacilityController extends Controller
                 $facilityInfrastructureToUpdate->save();
 
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['status']);
-
+                Log::debug($dataRes['status']);
                 return redirect()->back()->with('success', 'Facility Infrastructure Updated Successfully!');
             }
         }
