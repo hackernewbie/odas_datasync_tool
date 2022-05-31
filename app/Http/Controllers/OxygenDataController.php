@@ -68,7 +68,8 @@ class OxygenDataController extends Controller
 
                 //dd($allOxygenData[$count][5]);
                 /// dump($allOxygenData[$count][2][$count][2] . " --> " . $odasFacilityIdToInsert);
-                if($odasFacilityIdToInsert !== null && $facilityInfoIdToInsert !==null && isset($allOxygenData[$count][4])){
+                //dd($allOxygenData[$count][4]);
+                if($odasFacilityIdToInsert !== null && $facilityInfoIdToInsert !==null && $allOxygenData[$count][4] !=""){
                     $facilityNameForDB                          =   isset($allOxygenData[$count][2]) == false ?  'Empty' : $allOxygenData[$count][2];
                     $facilityNameForDB                          =   $facilityNameForDB != "" ? $facilityNameForDB : 0;
 
@@ -430,6 +431,7 @@ class OxygenDataController extends Controller
                 }
                 else{
                     /// No ODAS Facility ID in DB, generate ID first.
+                    //dd('here');
                 }
             }
             //dd("stop");
