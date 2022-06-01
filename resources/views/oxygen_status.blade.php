@@ -36,6 +36,7 @@
                                     <th class="align-middle" width="10%">LMO Capacity (MT)</th>
                                     <th class="align-middle" width="10%">PSA Gen Capacity (MT)</th>
                                     <th class="align-middle" width="10%">PSA Capacity (MT)</th>
+
                                     <th class="align-middle" width="10%">Gen Beds</th>
                                     <th class="align-middle" width="10%">HDU Beds</th>
                                     <th class="align-middle" width="10%">ICU Beds</th>
@@ -45,6 +46,7 @@
                                     <th class="align-middle" width="10%">Accuracy Remarks</th>
                                     <th class="align-middle" width="10%">Flag</th>
                                     <th class="align-middle" width="10%">Demand For Date</th>
+                                    <th class="align-middle" width="10%">Demand Raised Date</th>
                                     <th class="align-middle" width="10%">OE Demand By</th>
                                     <th class="align-middle" width="10%">Tot. Estimated Demand</th>
                                     <th class="align-middle" width="10%">UE Demand By</th>
@@ -55,7 +57,7 @@
                                     <th class="align-middle" width="10%">Total O2 Delivered</th>
                                     <th class="align-middle" width="10%">Total O2 Generated</th>
 
-                                    <th class="align-middle" width="40%">Action</th>
+                                    <th class="align-middle" width="40%">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -81,6 +83,7 @@
                                         <td>
                                             {{$item->psa_storage_capacity_in_MT}}
                                         </td>
+
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_gen_beds : 'NA'}}</td>
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_hdu_beds : 'NA'}}</td>
                                         <td>{{$item->FacilityBedInfo ? $item->FacilityBedInfo->no_icu_beds : 'NA'}}</td>
