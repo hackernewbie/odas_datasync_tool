@@ -302,6 +302,7 @@ class FacilityController extends Controller
             $updateFacilityBedInfoEndpointURI   =   'v1.0/odas/update-facility-bed-info';
 
             $facilityToUpdate                   =   Facility::where('facility_name',$facilityName)->first();
+
             $facilityInfra                      =   $facilityToUpdate->FacilityInfrastructure;
 
             $newToken                           =   getODASAccessToken();
@@ -311,7 +312,7 @@ class FacilityController extends Controller
             $odasToken->token         =   $newToken;
             $odasToken->timestamp_utc =   Carbon::now()->toJSON();
             $odasToken->save();
-            //dd($facilityInfra);
+
             /// Update Facility Bed Info
             $odasTokenToUse           =     $odasToken->token;
             $params = array(
@@ -327,8 +328,8 @@ class FacilityController extends Controller
                 "timestamp"     => $odasToken->timestamp_utc
             );
 
-            log::debug('Data to API: ' . $params);
             //dd($params);
+            Log::debug('Data to Facility Infrastructure API ');
 
             $client = new Client();
             $response = $client->post($odasApiBAseURL.$updateFacilityBedInfoEndpointURI, [

@@ -15,7 +15,6 @@ class BulkUpdatesController extends Controller
 
         try{
             $allFacilityNames   =   Facility::all();
-            //dd($allFacilityNames);
             app('App\Http\Controllers\FacilityController')->GetFacilities();
 
             /// Update the Log table
@@ -26,7 +25,6 @@ class BulkUpdatesController extends Controller
                 Log::debug('+++++++++++++++++++++++++++++++++++++++++++++++++');
 
                 Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
-
                 app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
 
 
