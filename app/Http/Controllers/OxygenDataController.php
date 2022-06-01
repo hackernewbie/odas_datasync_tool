@@ -234,7 +234,7 @@ class OxygenDataController extends Controller
                     $totalOxygenConsumedForDB        =  ConvertCuMToMT(($typeBConsumedIn24HoursForDB*$typeBCylinderCapacity) + ($typeDConsumedIn24HoursForDB*$typeDCylinderCapacity));
                     $totalOxygenDeliveredForDB       =  ConvertCuMToMT(($noOfFilledTypeBCylindersForDB*$typeBCylinderCapacity) + ($noOfFilledTypeDCylindersForDB*$typeDCylinderCapacity));
                     $totalOxygenGeneratedForDB       =  ConvertCuMToMT($psaCapacityInCumForDB);
-
+                    //dd($totalOxygenGeneratedForDB);
 
                     $oxygenParamsForDB                    =   [
                         'facility_information_id'                           =>  $facilityInfoIdToInsert,
@@ -314,6 +314,7 @@ class OxygenDataController extends Controller
                             $underEstimatedByForDB          = $demandEstimationForDB;
                         }
                     }
+
                     //dd($tempDemandAccuracyFlagForDB . ' : ' . 'Over-> ' . $overEstimatedByForDB . ' : Under-> ' . $underEstimatedByForDB . ' : Total-> ' . $totalEstimatedDemandForDB);
                     //Log::debug($oxygenParamsForDB);
 
@@ -349,7 +350,7 @@ class OxygenDataController extends Controller
 
                             Log::debug('Created Oxygen demand data ' . $createdFacilityOxygenDemand->id);
                         }
-
+                        dd($totalOxygenDeliveredForDB ? $totalOxygenDeliveredForDB : 0);
 
                         $createdFacilityOxygenConsumption   =   FacilityOxygenConsumption::create([
                             'oxygen_data_id'                    =>  $createdOxygenData->id,
@@ -429,10 +430,10 @@ class OxygenDataController extends Controller
                     }
                     DB::commit();
                 }
-                else{
-                    /// No ODAS Facility ID in DB, generate ID first.
-                    //dd('here');
-                }
+                // else{
+                //     /// No ODAS Facility ID in DB, generate ID first.
+                //     dd('Else');
+                // }
             }
             //dd("stop");
             //DB::commit();
