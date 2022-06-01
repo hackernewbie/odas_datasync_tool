@@ -350,7 +350,7 @@ class OxygenDataController extends Controller
 
                             Log::debug('Created Oxygen demand data ' . $createdFacilityOxygenDemand->id);
                         }
-                        dd($totalOxygenDeliveredForDB ? $totalOxygenDeliveredForDB : 0);
+                        //dd($totalOxygenDeliveredForDB ? $totalOxygenDeliveredForDB : 0);
 
                         $createdFacilityOxygenConsumption   =   FacilityOxygenConsumption::create([
                             'oxygen_data_id'                    =>  $createdOxygenData->id,
