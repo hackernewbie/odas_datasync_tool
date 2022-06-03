@@ -51,6 +51,7 @@ class FacilityController extends Controller
                 $generatedUUID           = Str::uuid();
                 $tempFacilityName        = Facility::where('facility_name',$listOfFacilities[$count][0])->latest()->first();
 
+                Log::debug("                             ");
                 Log::debug("Processing Facility: " . $tempFacilityName);
 
                 if(isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
@@ -149,7 +150,6 @@ class FacilityController extends Controller
                 }
                 else if($tempFacilityName !== null && isset($listOfFacilities[$count][1]) == true && isset($listOfFacilities[$count][19]) == true){
                     Log::debug('Processing for update: ' . $tempFacilityName);
-                    //dd('In update');
                     $facilityToUpdate                =  $tempFacilityName;
                     $facilityToUpdate->update($facilityParamsForDB);
                     /// Update Facility Nodal Officer Data
@@ -231,7 +231,7 @@ class FacilityController extends Controller
                         "addressLine1"              => $facilityBeingProcessed->address_line_1,
                         "addressLine2"              => $facilityBeingProcessed->address_line_2,
                         "city"                      => $facilityBeingProcessed->city_lgd_code,
-                        "district"                  => $facilityBeingProcessed->district_lgd_code,
+                        //"district"                  => $facilityBeingProcessed->district_lgd_code,
                         "pincode"                   => $facilityBeingProcessed->pincode,
                         "state"                     => $facilityBeingProcessed->state_lgd_code,
                         "subdistrict"               => $facilityBeingProcessed->subdistrict_lgd_code
@@ -296,6 +296,7 @@ class FacilityController extends Controller
     }
 
     public function UpdateFacilityInfrastructure($facilityName){
+        Log::debug('                                 ');
         Log::debug('Processing ' . $facilityName);
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
