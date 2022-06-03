@@ -230,8 +230,8 @@ class FacilityController extends Controller
                     'address' => [
                         "addressLine1"              => $facilityBeingProcessed->address_line_1,
                         "addressLine2"              => $facilityBeingProcessed->address_line_2,
-                        "city"                      => $facilityBeingProcessed->city_lgd_code,
-                        //"district"                  => $facilityBeingProcessed->district_lgd_code,
+                        //"city"                      => $facilityBeingProcessed->city_lgd_code,
+                        "district"                  => $facilityBeingProcessed->district_lgd_code,
                         "pincode"                   => $facilityBeingProcessed->pincode,
                         "state"                     => $facilityBeingProcessed->state_lgd_code,
                         "subdistrict"               => $facilityBeingProcessed->subdistrict_lgd_code
