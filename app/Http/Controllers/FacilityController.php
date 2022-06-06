@@ -35,11 +35,11 @@ class FacilityController extends Controller
 
     public function GetFacilities(){
         Log::debug("Attempting to read data from Facility Information Sheet.");
-        $gsheet             = new GoogleSheetService();
+        $gsheet             =   new GoogleSheetService();
         $listOfFacilities   =   $gsheet->readGoogleSheet(config('google.facility_sheet_name'),'AL');
         //dd($listOfFacilities);
         if($listOfFacilities == null || count($listOfFacilities) <= 2){
-            Log::error("No Data in aFacility Information Sheet.");
+            Log::error("No Data in Facility Information Sheet. Source Google Sheet empty.");
             return redirect()->back()->with('error','Source Google Sheet Empty');
         }
 
@@ -205,7 +205,7 @@ class FacilityController extends Controller
     }
 
     public function GenerateFacilityId($hospitalName){
-        Log::debug('\n -------------------------------------------------------');
+        Log::debug('-------------------------------------------------------');
         Log::debug("Attempting to generate FacilityId for: " . $hospitalName);
         $response = null;
         try{
@@ -297,7 +297,7 @@ class FacilityController extends Controller
 
     public function UpdateFacilityInfrastructure($facilityName){
         Log::debug('                                 ');
-        Log::debug('Processing ' . $facilityName);
+        Log::debug('Processing - ' . $facilityName);
         try{
             $odasApiBAseURL                     =   config('odas.odas_base_url');
             $updateFacilityBedInfoEndpointURI   =   'v1.0/odas/update-facility-bed-info';
@@ -330,7 +330,7 @@ class FacilityController extends Controller
             );
 
             //dd($params);
-            Log::debug('Data to Facility Infrastructure API ');
+            Log::debug('Pushing Data to Facility Infrastructure API for - ' . $facilityName);
 
             $client = new Client();
             $response = $client->post($odasApiBAseURL.$updateFacilityBedInfoEndpointURI, [
@@ -348,7 +348,7 @@ class FacilityController extends Controller
                 $facilityInfrastructureToUpdate->save();
 
                 //dd($dataRes['referencenumber'] . " : " . $dataRes['status']);
-                Log::debug($dataRes['status']);
+                Log::debug('Facility Infrastructure Updated Successfully!');
                 return redirect()->back()->with('success', 'Facility Infrastructure Updated Successfully!');
             }
         }

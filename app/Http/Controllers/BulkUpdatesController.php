@@ -14,22 +14,26 @@ class BulkUpdatesController extends Controller
         Log::debug('Intiating BulkUpdateFacilityO2Infra');
 
         try{
-            $allFacilityNames   =   Facility::all();
             app('App\Http\Controllers\FacilityController')->GetFacilities();
+            $allFacilityNames   =   Facility::all();
 
             /// Update the Log table
-            ProcessesRun::create(['description' => 'Facility Information Updated.','status' => 'Success']);
+            ProcessesRun::create(['description' => 'Facility Information Updated To Local DB.','status' => 'Success']);
 
             foreach($allFacilityNames as $facility){
+                Log::debug("                             ");
                 Log::debug('Running Facility Information Fetch To Local DB!');
                 Log::debug('+++++++++++++++++++++++++++++++++++++++++++++++++');
 
-                Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
-                app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
+                // Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
+                // app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
 
 
                 Log::debug('Running Bulk Data Push for: ' . $facility->facility_name . ' - ' . $facility->odas_facility_id);
                 if($facility->odas_facility_id != null){
+                    Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
+                    app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
+
                     app('App\Http\Controllers\OxygenDataController')->FetchOxygenData();
                     /// Update the Log table
                     ProcessesRun::create(['description' => 'Oxygen Data Fetched from Master Sheet.','status' => 'Success']);
