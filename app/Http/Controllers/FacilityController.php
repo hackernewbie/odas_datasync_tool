@@ -213,86 +213,89 @@ class FacilityController extends Controller
             $updateFacilityIDEndpointURI        =   'v1.0/odas/update-facility-info';
             $facilityBeingProcessed             =   Facility::where('facility_name',$hospitalName)->latest()->first();
 
-            if($facilityBeingProcessed->odas_facility_id != null)
-            {
-                $newToken                           =   getODASAccessToken();
+            // if($facilityBeingProcessed->odas_facility_id != null)
+            // {
 
-                // Save the authToken to the DB
-                $odasToken                =   new ODASToken();
-                $odasToken->token         =   $newToken;
-                $odasToken->timestamp_utc =   Carbon::now()->toJSON();
-                $odasToken->save();
-                //dd('success');
-                Log::debug("API Auth Token Generated!!");
+            // }
+            // else{
+            //     Log::debug('Facility ID already present for - ' . $hospitalName . ' Skipping.');
+            //     return redirect()->back()->with('success', 'Facility ID already present for - ' . $hospitalName . ' Skipping.');
+            // }
 
-                /// Update FacilityInfo
-                $odasTokenToUse           =     $odasToken->token;
-                $params = array(
-                    'facility' => [
-                        'address' => [
-                            "addressLine1"              => $facilityBeingProcessed->address_line_1,
-                            "addressLine2"              => $facilityBeingProcessed->address_line_2,
-                            //"city"                      => $facilityBeingProcessed->city_lgd_code,        /// Removed as per suggestion of Manika from ODAS
-                            "district"                  => $facilityBeingProcessed->district_lgd_code,
-                            "pincode"                   => $facilityBeingProcessed->pincode,
-                            "state"                     => $facilityBeingProcessed->state_lgd_code,
-                            "subdistrict"               => $facilityBeingProcessed->subdistrict_lgd_code
-                        ],
-                        "facilitysubtype"               => 0,
-                        "facilitytype"                  => $facilityBeingProcessed->facility_type_code,
-                        "id"                            =>  " ",
-                        "langitude"                     => $facilityBeingProcessed->longitude,
-                        "latitude"                      => $facilityBeingProcessed->latitude,
-                        "name"                          => $facilityBeingProcessed->facility_name,
-                        "ownershipsubtype"              => $facilityBeingProcessed->ownership_subtype,
-                        "ownershiptype"                 => $facilityBeingProcessed->ownership_type
+
+            $newToken                           =   getODASAccessToken();
+
+            // Save the authToken to the DB
+            $odasToken                =   new ODASToken();
+            $odasToken->token         =   $newToken;
+            $odasToken->timestamp_utc =   Carbon::now()->toJSON();
+            $odasToken->save();
+            //dd('success');
+            Log::debug("API Auth Token Generated!!");
+
+            /// Update FacilityInfo
+            $odasTokenToUse           =     $odasToken->token;
+            $params = array(
+                'facility' => [
+                    'address' => [
+                        "addressLine1"              => $facilityBeingProcessed->address_line_1,
+                        "addressLine2"              => $facilityBeingProcessed->address_line_2,
+                        //"city"                      => $facilityBeingProcessed->city_lgd_code,        /// Removed as per suggestion of Manika from ODAS
+                        "district"                  => $facilityBeingProcessed->district_lgd_code,
+                        "pincode"                   => $facilityBeingProcessed->pincode,
+                        "state"                     => $facilityBeingProcessed->state_lgd_code,
+                        "subdistrict"               => $facilityBeingProcessed->subdistrict_lgd_code
                     ],
-                    "nodalcontacts" => [
-                        [
-                            "countrycode"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code ? $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code : "+91",
-                            "designation"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_designation,
-                            "email"             => $facilityBeingProcessed->FacilityNodalOfficer->officer_email,
-                            "firstname"         => $facilityBeingProcessed->FacilityNodalOfficer->officer_first_name,
-                            "lastname"          => $facilityBeingProcessed->FacilityNodalOfficer->officer_last_name,
-                            "middlename"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_middle_name,
-                            "mobilenumber"      => $facilityBeingProcessed->FacilityNodalOfficer->officer_mobile_number,
-                            "salutation"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_salutation
-                        ]
-                    ],
-                    "requestId" => $facilityBeingProcessed->requestId,
-                    "timestamp" => $odasToken->timestamp_utc
-                 );
+                    "facilitysubtype"               => 0,
+                    "facilitytype"                  => $facilityBeingProcessed->facility_type_code,
+                    "id"                            =>  " ",
+                    "langitude"                     => $facilityBeingProcessed->longitude,
+                    "latitude"                      => $facilityBeingProcessed->latitude,
+                    "name"                          => $facilityBeingProcessed->facility_name,
+                    "ownershipsubtype"              => $facilityBeingProcessed->ownership_subtype,
+                    "ownershiptype"                 => $facilityBeingProcessed->ownership_type
+                ],
+                "nodalcontacts" => [
+                    [
+                        "countrycode"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code ? $facilityBeingProcessed->FacilityNodalOfficer->officer_country_code : "+91",
+                        "designation"       => $facilityBeingProcessed->FacilityNodalOfficer->officer_designation,
+                        "email"             => $facilityBeingProcessed->FacilityNodalOfficer->officer_email,
+                        "firstname"         => $facilityBeingProcessed->FacilityNodalOfficer->officer_first_name,
+                        "lastname"          => $facilityBeingProcessed->FacilityNodalOfficer->officer_last_name,
+                        "middlename"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_middle_name,
+                        "mobilenumber"      => $facilityBeingProcessed->FacilityNodalOfficer->officer_mobile_number,
+                        "salutation"        => $facilityBeingProcessed->FacilityNodalOfficer->officer_salutation
+                    ]
+                ],
+                "requestId" => $facilityBeingProcessed->requestId,
+                "timestamp" => $odasToken->timestamp_utc
+             );
 
-                //dd($params);
+            //dd($params);
 
 
-                $client = new Client();
-                Log::debug("Attempting to push data to API: " . $odasApiBAseURL.$updateFacilityIDEndpointURI);
-                $response = $client->post($odasApiBAseURL.$updateFacilityIDEndpointURI, [
-                    'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
-                    'body'    => json_encode($params)
-                ]);
+            $client = new Client();
+            Log::debug("Attempting to push data to API: " . $odasApiBAseURL.$updateFacilityIDEndpointURI);
+            $response = $client->post($odasApiBAseURL.$updateFacilityIDEndpointURI, [
+                'headers' => ['Content-Type' => 'application/json', 'Accept' => 'application/json','Authorization'=>'Bearer ' .$odasTokenToUse,],
+                'body'    => json_encode($params)
+            ]);
 
-                $dataRes =   json_decode($response->getBody(), true);
+            $dataRes =   json_decode($response->getBody(), true);
 
 
-                if($dataRes !== null){
-                    /// Save the reference_number, facilityId and status in the local DB
-                    $facilityToUpdate                           =   Facility::find($facilityBeingProcessed->id);
-                    $facilityToUpdate->odas_facility_id         =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
-                    $facilityToUpdate->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
-                    $facilityToUpdate->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
-                    $facilityToUpdate->save();
+            if($dataRes !== null){
+                /// Save the reference_number, facilityId and status in the local DB
+                $facilityToUpdate                           =   Facility::find($facilityBeingProcessed->id);
+                $facilityToUpdate->odas_facility_id         =   $dataRes['odasfacilityid'] ? $dataRes['odasfacilityid'] : 'No Facility Id Received';
+                $facilityToUpdate->odas_reference_number    =   $dataRes['referencenumber'] ? $dataRes['referencenumber'] : 'No Reference Number';
+                $facilityToUpdate->status                   =   $dataRes['status'] ? $dataRes['status'] : 'No Status Number';
+                $facilityToUpdate->save();
 
-                    Log::debug('----------------------------------------');
-                    Log::debug('Facility Id Fetched and Updated in Database Successfully!' . ' - ' .$dataRes['odasfacilityid']);
-                    /// Update Facility Infrastructure Data
-                    return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
-                }
-            }
-            else{
-                Log::debug('Facility ID already present for - ' . $hospitalName . ' Skipping.');
-                return redirect()->back()->with('success', 'Facility ID already present for - ' . $hospitalName . ' Skipping.');
+                Log::debug('----------------------------------------');
+                Log::debug('Facility Id Fetched and Updated in Database Successfully!' . ' - ' .$dataRes['odasfacilityid']);
+                /// Update Facility Infrastructure Data
+                return redirect()->back()->with('success', 'Facility Id Fetched and Updated in Database Successfully! Please update the same in the MasterSheet.');
             }
         }
         catch(\GuzzleHttp\Exception\ClientException $ex){

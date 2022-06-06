@@ -19,7 +19,6 @@ class BulkUpdatesController extends Controller
 
             /// Update the Log table
             ProcessesRun::create(['description' => 'Facility Information Updated To Local DB.','status' => 'Success']);
-
             foreach($allFacilityNames as $facility){
                 Log::debug("                             ");
                 Log::debug('Running Facility Information Fetch To Local DB!');
@@ -28,9 +27,8 @@ class BulkUpdatesController extends Controller
                 // Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
                 // app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
 
-
                 Log::debug('Running Bulk Data Push for: ' . $facility->facility_name . ' - ' . $facility->odas_facility_id);
-                if($facility->odas_facility_id != null){
+                if($facility->odas_facility_id != null || $facility->odas_facility_id != ""){
                     Log::debug('Running Facility Infrastructure Update for - ' . $facility->facility_name);
                     app('App\Http\Controllers\FacilityController')->UpdateFacilityInfrastructure($facility->facility_name);
 
@@ -55,13 +53,16 @@ class BulkUpdatesController extends Controller
                     ProcessesRun::create(['description' => 'Oxygen Demand Data pushed to ODAS.','status' => 'Success']);
                 }
                 else{
-                    //Log::debug('Skipping: ' . $facility->facility_name . '. No facility Id assigned!');
-                    Log::debug('No facility Id assigned for ' . $facility->facility_name.'. Generating ODAS FacilityID.');
+                    Log::debug('No facility Id assigned for ' . $facility->facility_name.'');
+                    if($facility->odas_facility_id == null || $facility->odas_facility_id == ""){
+                        //Log::debug('Skipping: ' . $facility->facility_name . '. No facility Id assigned!');
+                        Log::debug('No facility Id assigned for ' . $facility->facility_name.'. Generating ODAS FacilityID.');
 
-                    app('App\Http\Controllers\FacilityController')->GenerateFacilityId($facility->facility_name);
-                    /// Update the Log table
-                    ProcessesRun::create(['description' => 'Facility Id Generation Process Run.','status' => 'Success']);
-                    Log::debug('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_');
+                        app('App\Http\Controllers\FacilityController')->GenerateFacilityId($facility->facility_name);
+                        /// Update the Log table
+                        ProcessesRun::create(['description' => 'Facility Id Generation Process Run.','status' => 'Success']);
+                        Log::debug('+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_');
+                    }
                 }
             }
         }
