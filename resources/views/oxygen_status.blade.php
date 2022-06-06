@@ -57,6 +57,8 @@
                                     <th class="align-middle" width="10%">Total O2 Delivered</th>
                                     <th class="align-middle" width="10%">Total O2 Generated</th>
 
+                                    <th class="align-middle" width="40%">Status</th>
+
                                     <th class="align-middle" width="40%">Actions</th>
                                 </tr>
                             </thead>
@@ -103,6 +105,8 @@
                                         <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_consumed : 'NA'}}</td>
                                         <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_delivered : 'NA'}}</td>
                                         <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->total_oxygen_generated : 'NA'}}</td>
+
+                                        <td>{{$item->FacilityOxygenConsumption ? $item->FacilityOxygenConsumption->status : 'NA'}}</td>
 
                                         {{-- <td>
                                             <!-- Button trigger modal -->
